@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROMPT MASTER TENNIS v2.0 — Architettura MCP & Betting Signal Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        terminal: {
+                            bg: '#070b12',
+                            panel: '#0f1623',
+                            card: '#131c2e',
+                            border: '#1e293b',
+                            accent: '#10b981',
+                            optic: '#a3e635',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070b12;
+            color: #e2e8f0;
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.06) 0%, transparent 35%),
+                radial-gradient(circle at 85% 85%, rgba(163, 230, 53, 0.04) 0%, transparent 35%),
+                linear-gradient(to bottom, rgba(15, 22, 35, 0.9), rgba(7, 11, 18, 1));
+            min-height: 100vh;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070b12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Highlight v2.0 animations & styles */
+        .v2-highlight-active .is-v2-new {
+            border-color: #10b981 !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(19, 28, 46, 0.95) 100%) !important;
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+        }
+        .v2-highlight-active .is-v2-opt {
+            border-color: #f59e0b !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(19, 28, 46, 0.95) 100%) !important;
+            box-shadow: 0 0 20px -5px rgba(245, 158, 11, 0.18);
+        }
+        .v2-note-banner {
+            display: none;
+        }
+        .v2-highlight-active .v2-note-banner {
+            display: flex;
+        }
+
+        .court-grid-bg {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200 court-grid-bg">
+
+    <!-- STICKY HEADER -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#070b12]/90 border-b border-slate-800/80 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                
+                <!-- Brand & Title -->
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/20 to-lime-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 shadow-inner">
+                        <i class="fa-solid fa-chart-network text-emerald-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white font-mono">
+                                PROMPT MASTER TENNIS <span class="text-emerald-400">v2.0</span>
+                            </h1>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-lime-500/20 text-lime-300 border border-lime-400/40 shadow-sm">
+                                <i class="fa-solid fa-star text-[10px] text-lime-400"></i>
+                                Voto 10/10 — Betting Signal Edition
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Architettura di Espansione Bilaterale MCP + Filtro Ambientale CPI + Motore Segnali & Trigger Live
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Toolbar -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Toggle Novità v2.0 -->
+                    <button id="btnToggleDiff" onclick="toggleV2Highlights()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span id="txtToggleDiff">Mostra Novità v2.0</span>
+                    </button>
+
+                    <!-- Download .TXT -->
+                    <button onclick="downloadFile('txt')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:border-slate-600 transition-all cursor-pointer">
+                        <i class="fa-regular fa-file-lines text-cyan-400"></i>
+                        <span>Scarica .TXT</span>
+                    </button>
+
+                    <!-- Download .MD -->
+                    <button onclick="downloadFile('md')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:border-slate-600 transition-all cursor-pointer">
+                        <i class="fa-brands fa-markdown text-purple-400"></i>
+                        <span>Scarica .MD</span>
+                    </button>
+
+                    <!-- Primary Copy Full Prompt -->
+                    <button onclick="copyFullPrompt()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Copia Prompt Intero</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TOP METRICS & CHANGELOG BANNER (Collapsible / Always informative) -->
+        <div id="v2SummaryBanner" class="mb-6 rounded-xl border border-slate-800 bg-[#0f1623]/90 p-4 shadow-md transition-all">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0 mt-0.5">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                            Upgrade Architetturale v1.1 (7.5/10) <i class="fa-solid fa-arrow-right mx-1"></i> v2.0 (10/10)
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                            Rimosso il blocco sulla traduzione in mercati della v1.1, integrato il <strong class="text-white">Filtro Ambientale/Fisico (Sez. 2)</strong>, aggiunto il <strong class="text-white">Modulo Segnali Betting, Gradi A/B/C e Trigger Live (Sez. 8)</strong>, compresse del 30% le ridondanze istruzionali e completata la <strong class="text-white">Sezione 11</strong> (troncata nella v1.1).
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
+                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-mono">Motore Tattico</div>
+                        <div class="text-sm font-bold text-emerald-400 font-mono">10/10</div>
+                    </div>
+                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-mono">Signal Engine</div>
+                        <div class="text-sm font-bold text-lime-400 font-mono">10/10</div>
+                    </div>
+                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                        <div class="text-[10px] text-slate-400 uppercase font-mono">Sezioni</div>
+                        <div class="text-sm font-bold text-cyan-400 font-mono">0 — 11</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN 2-COLUMN GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT COLUMN: CONFIGURATORE MATCH & NAVIGATION (4 Cols on Desktop) -->
+            <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
+                
+                <!-- CONFIGURATORE MATCH PANEL -->
+                <div class="rounded-xl border border-slate-800 bg-[#0f1623] overflow-hidden shadow-xl">
+                    <div class="px-4 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-emerald-400 text-sm"></i>
+                            <h2 class="text-sm font-bold text-white">Configuratore Match <span class="text-xs font-normal text-slate-400">(Opzionale)</span></h2>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="loadDemoMatch()" title="Carica esempio precompilato" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition cursor-pointer">
+                                <i class="fa-solid fa-flask mr-1"></i>Demo
+                            </button>
+                            <button onclick="clearMatchConfig()" title="Svuota tutti i campi" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700 transition cursor-pointer">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 space-y-3.5">
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Compila i parametri per generare automaticamente in coda al prompt il blocco dati pronto per l'LLM.
+                        </p>
+
+                        <!-- Giocatori A & B -->
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                    Giocatore A
+                                </label>
+                                <input type="text" id="cfgPlayerA" oninput="updateDynamicConfig()" placeholder="es. Jannik Sinner" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                    Giocatore B
+                                </label>
+                                <input type="text" id="cfgPlayerB" oninput="updateDynamicConfig()" placeholder="es. Carlos Alcaraz" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                            </div>
+                        </div>
+
+                        <!-- Torneo / Superficie -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                Torneo & Superficie
+                            </label>
+                            <input type="text" id="cfgTournament" oninput="updateDynamicConfig()" placeholder="es. ATP Finals Torino — Hard Indoor" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                        </div>
+
+                        <!-- CPI & Formato -->
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                    CPI / Velocità Campo
+                                </label>
+                                <input type="text" id="cfgCPI" oninput="updateDynamicConfig()" placeholder="es. CPI 42.5 (Veloce, rimbalzo basso)" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                    Formato Match
+                                </label>
+                                <select id="cfgFormat" onchange="updateDynamicConfig()" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition font-mono">
+                                    <option value="">-- Non specificato --</option>
+                                    <option value="Best of 3 Set (2 su 3)">Best of 3 Set (2 su 3)</option>
+                                    <option value="Best of 5 Set (3 su 5 - Slam)">Best of 5 Set (3 su 5 - Slam)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Quote Bookmaker -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                Quote Bookmaker Attuali
+                            </label>
+                            <input type="text" id="cfgOdds" oninput="updateDynamicConfig()" placeholder="es. ML: A @1.65 / B @2.30 | O/U 22.5 @1.88 | H -2.5 @1.95" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                        </div>
+
+                        <!-- Note Dati MCP / PPR / TDI -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                Note Dati (MCP / PPR / TDI / Condizioni)
+                            </label>
+                            <textarea id="cfgNotes" rows="3" oninput="updateDynamicConfig()" placeholder="Inserisci estratti PPR, TDI, sequenze MCP, stato fisico o condizioni palle..." class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono resize-y"></textarea>
+                        </div>
+
+                        <!-- Live Status Badge -->
+                        <div id="cfgStatusBox" class="px-3 py-2 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-between">
+                            <span id="cfgStatusText" class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
+                                Nessun match configurato (Solo Prompt Master)
+                            </span>
+                            <button onclick="copyFullPrompt()" class="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 underline cursor-pointer">
+                                Copia ora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK SECTION NAVIGATION -->
+                <div class="rounded-xl border border-slate-800 bg-[#0f1623] overflow-hidden shadow-xl hidden lg:block">
+                    <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                            <i class="fa-solid fa-list-ol text-cyan-400 mr-1.5"></i>Indice Architettura (0-11)
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400" id="charCountBadge">0 caratteri</span>
+                    </div>
+                    <nav id="sectionNavList" class="p-2 max-h-80 overflow-y-auto space-y-1 text-xs">
+                        <!-- Populated by JS -->
+                    </nav>
+                </div>
+
+            </aside>
+
+            <!-- RIGHT COLUMN: PROMPT VIEWER (8 Cols on Desktop) -->
+            <section class="lg:col-span-8 space-y-4">
+
+                <!-- VIEW CONTROLS & SEARCH BAR -->
+                <div class="rounded-xl border border-slate-800 bg-[#0f1623] p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
+                    <!-- View Mode Switcher -->
+                    <div class="inline-flex rounded-lg p-1 bg-slate-950 border border-slate-800">
+                        <button id="tabViewCards" onclick="switchViewMode('cards')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer">
+                            <i class="fa-solid fa-layer-group mr-1.5"></i>Vista a Sezioni
+                        </button>
+                        <button id="tabViewRaw" onclick="switchViewMode('raw')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer">
+                            <i class="fa-solid fa-terminal mr-1.5"></i>Testo Integrale Raw
+                        </button>
+                    </div>
+
+                    <!-- Search inside Prompt -->
+                    <div class="relative flex-1 max-w-sm">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="text" id="searchPromptInput" oninput="filterSections()" placeholder="Cerca nel prompt (es. Lansdorp, CPI, Grado A...)" class="w-full pl-8 pr-8 py-1.5 rounded-lg text-xs bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+                        <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs cursor-pointer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MODE 1: STRUCTURED SECTIONS VIEW -->
+                <div id="cardsViewContainer" class="space-y-4">
+                    
+                    <!-- Master Header Card -->
+                    <div class="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-[#131c2e] to-[#131c2e] p-5 shadow-lg">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3 mb-3">
+                            <div>
+                                <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-semibold">INTESTAZIONE UFFICIALE DEL SISTEMA</span>
+                                <h2 class="text-base sm:text-lg font-extrabold text-white font-mono mt-0.5">PROMPT MASTER TENNIS v2.0</h2>
+                            </div>
+                            <button onclick="copyHeaderBlock()" class="self-start sm:self-center px-2.5 py-1 rounded text-xs font-mono bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                                <i class="fa-regular fa-copy mr-1"></i>Copia Intestazione
+                            </button>
+                        </div>
+                        <pre class="font-mono text-xs sm:text-sm text-emerald-200 whitespace-pre-wrap leading-relaxed select-all">PROMPT MASTER TENNIS v2.0
+INTERVENTO DI COLLISIONE TECNICA BILATERALE ESPANSA &amp; GENERAZIONE SEGNALI BETTING
+Versione 2.0 — Architettura di espansione MCP + Modulo Mercati</pre>
+                    </div>
+
+                    <!-- Sections 0 to 11 Container (Rendered via JS for exact verbatim accuracy) -->
+                    <div id="sectionsListContainer" class="space-y-4"></div>
+
+                    <!-- Dynamic Match Appended Block Preview -->
+                    <div id="dynamicMatchCard" class="hidden rounded-xl border-2 border-dashed border-lime-500/50 bg-lime-950/15 p-5 shadow-lg transition-all">
+                        <div class="flex items-center justify-between border-b border-lime-500/20 pb-3 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-lime-400/20 text-lime-300 border border-lime-400/40">
+                                    INPUT MATCH DINAMICO ATTIVO
+                                </span>
+                                <h3 class="text-xs sm:text-sm font-bold text-white font-mono">
+                                    DATI DEL MATCH ASSEGNATO (Aggiunti in coda al Prompt)
+                                </h3>
+                            </div>
+                            <button onclick="copyMatchBlockOnly()" class="px-2.5 py-1 rounded text-xs font-mono bg-lime-500/20 hover:bg-lime-500/30 text-lime-200 border border-lime-500/40 transition cursor-pointer">
+                                <i class="fa-regular fa-copy mr-1"></i>Copia Solo Input Match
+                            </button>
+                        </div>
+                        <pre id="dynamicMatchPreviewText" class="font-mono text-xs sm:text-sm text-lime-100 whitespace-pre-wrap leading-relaxed"></pre>
+                    </div>
+
+                </div>
+
+                <!-- MODE 2: RAW VERBATIM TEXT VIEW -->
+                <div id="rawViewContainer" class="hidden rounded-xl border border-slate-800 bg-[#0b101b] overflow-hidden shadow-2xl">
+                    <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-xs font-mono font-semibold text-slate-200">PROMPT_MASTER_TENNIS_v2.0_RAW.txt</span>
+                            <span class="text-[11px] font-mono text-slate-400">(Testo Integrale Verbatim pronto per copia/incolla)</span>
+                        </div>
+                        <button onclick="copyFullPrompt()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition cursor-pointer">
+                            <i class="fa-solid fa-copy mr-1.5"></i>Copia Tutto il Testo Raw
+                        </button>
+                    </div>
+                    <div class="p-5 overflow-x-auto">
+                        <pre id="rawFullPromptOutput" class="font-mono text-xs sm:text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed select-all"></pre>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-slate-800/80 text-center sm:flex sm:items-center sm:justify-between text-xs text-slate-500">
+        <div class="flex items-center justify-center gap-2">
+            <i class="fa-solid fa-terminal text-emerald-500"></i>
+            <span>PROMPT MASTER TENNIS v2.0 — Architettura di Espansione MCP &amp; Betting Signal Engine</span>
+        </div>
+        <div class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-400">
+            Testo Integrale Verbatim • 100% Client-Side • Zero Dipendenze Esterne
+        </div>
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- APPLICATION JAVASCRIPT -->
+    <script>
+        // ============================================================================
+        // 1. VERBATIM INTEGRAL PROMPT DATA STRUCTURE (100% Exact Text)
+        // ============================================================================
+        const PROMPT_HEADER = `PROMPT MASTER TENNIS v2.0
+INTERVENTO DI COLLISIONE TECNICA BILATERALE ESPANSA & GENERAZIONE SEGNALI BETTING
+Versione 2.0 — Architettura di espansione MCP + Modulo Mercati`;
+
+        const PROMPT_SECTIONS = [
+            {
+                id: "sec-0",
+                number: "0",
+                title: "0. IDENTITÀ E MANDATO",
+                status: "optimized",
+                badgeText: "OTTIMIZZATO v2.0",
+                v2Note: "Sbloccata la finalità quantitativa: l'analista ora traduce esplicitamente le collisioni tecniche in asimmetrie sfruttabili sui mercati di scommessa.",
+                content: `0. IDENTITÀ E MANDATO
+Agisci come analista tecnico-tattico d'élite e stratega quantitativo specializzato nella ricostruzione delle interazioni fra due tennisti professionisti e nella loro traduzione in asimmetrie sfruttabili sui mercati di scommessa.
+Il tuo obiettivo non è confrontare separatamente le qualità statiche dei due atleti, ma ricostruire come le rispettive capacità si scontrano durante lo sviluppo dei punti, attraverso le differenti soluzioni di gioco, nelle condizioni ambientali specifiche e nella ripetizione delle interazioni durante il match.
+Assumi il Match Charting Project (MCP) come modello strutturale di espansione del ragionamento colpo per colpo: non usarlo solo come database statistico finale, ma come logica per individuare cosa accade dopo ogni produzione tecnica.
+L'analisi è rigorosamente bilaterale, ma il giudizio finale non deve essere diplomatico né artificialmente equilibrato: il tuo compito è far emergere gli squilibri reali e trasformarli in segnali operativi.`
+            },
+            {
+                id: "sec-1",
+                number: "1",
+                title: "1. ARCHITETTURA COGNITIVA",
+                status: "optimized",
+                badgeText: "COMPRESSO v2.0",
+                v2Note: "Flusso causale compattato e reso più denso: eliminate le ripetizioni concettuali della v1.1 preservando l'intera catena Produzione → Risposta → Trasformazione.",
+                content: `1. ARCHITETTURA COGNITIVA
+Il principio cardine dell'intervento è:
+Una capacità produce una situazione → la situazione modifica le possibilità tecniche dell'avversario → la risposta dell'avversario trasforma a sua volta le opzioni del primo giocatore.
+Il flusso dinamico da ricostruire è:
+Produzione → Risposta → Trasformazione della situazione → Nuove opzioni tecniche → Contromossa → Adattamento → Conseguenze sul punteggio → Ripetizione e tenuta.
+Seleziona e sviluppa esclusivamente le interazioni tecnicamente pertinenti al repertorio dei due giocatori, distinguendo ciò che è riproducibile con continuità da ciò che richiede condizioni estreme o episodiche.`
+            },
+            {
+                id: "sec-2",
+                number: "2",
+                title: "2. FILTRO AMBIENTALE, FISICO E CONDIZIONI DEL MATCH [NUOVO IN v2.0]",
+                status: "new",
+                badgeText: "NUOVO IN v2.0",
+                v2Note: "Colmata la lacuna ambientale della v1.1: introduce CPI (velocità/rimbalzo), condizioni indoor/outdoor, altitudine, usura palle e formato 2 su 3 vs 3 su 5 set.",
+                content: `2. FILTRO AMBIENTALE, FISICO E CONDIZIONI DEL MATCH [NUOVO IN v2.0]
+Nessuna collisione tecnica avviene nel vuoto. Prima di espandere gli scambi, calibra l'efficacia di ogni produzione attraverso i parametri contestuali dell'incontro:
+- Superficie e Coefficiente di Velocità/Rimbalzo (CPI, altezza del rimbalzo, attrito): valuta quanto il campo premia la penetrazione piatta, quanto amplifica il topspin/kick e quanto tempo concede per la preparazione dei colpi.
+- Condizioni Atmosferiche e Ambientali: indoor vs outdoor, altitudine, umidità/temperatura, pesantezza delle palle utilizzate nel torneo.
+- Formato e Variabile Fisica: distingue nettamente tra match 2 su 3 e 3 su 5 set. Integra la tenuta atletica, il dispendio energetico degli stili di gioco e la fatica accumulata nei turni precedenti per valutare il decadimento delle produzioni nel secondo e terzo/quarto set.`
+            },
+            {
+                id: "sec-3",
+                number: "3",
+                title: "3. MODELLO DI ESPANSIONE MCP E GERARCHIA DELLE FONTI",
+                status: "optimized",
+                badgeText: "UNIFICATO v2.0",
+                v2Note: "Unifica le vecchie sezioni 2 e 8 della v1.1 in un'unica gerarchia rigorosa delle fonti (MCP, PPR, TDI, Atlante, tre S0) con distinzione netta tra dedotto e osservato.",
+                content: `3. MODELLO DI ESPANSIONE MCP E GERARCHIA DELLE FONTI
+Usa la tassonomia del Match Charting Project per tracciare le dimensioni del gioco:
+- Servizio (1ª e 2ª, direzioni: T, corpo, esterno; servizio e volée).
+- Risposta (posizione d'impatto, profondità, blocco, aggressività).
+- Sviluppo (diritto/rovescio, inside-out, inside-in, direzioni lungolinea/incrociato, variazioni di rotazione/slice/palla corta/lob).
+- Lunghezza dello scambio (1–3, 4–6, 7–9, 10+ colpi), approcci a rete, passanti, vincenti, errori forzati (FE) e non forzati (UFE).
+
+UTILIZZO RIGOROSO DELLE FONTI:
+- PPR: stabilisce quali soluzioni appartengono al funzionamento abituale del giocatore (non inventare soluzioni tatticamente comode se assenti dal repertorio).
+- TDI: qualifica la qualità intrinseca dei fondamentali, da contestualizzare sempre nelle condizioni di pressione ricevuta.
+- ATLANTE: spiega i nessi causali meccanici (es. profondità risposta → arretramento sul 3° colpo; angolo → spostamento laterale → perdita di equilibrio → calo qualità d'impatto).
+- TRE S0 e DATI MCP OSSERVATI: corroborano frequenze, continuità ed esiti empirici.
+
+Distingui sempre con chiarezza tra:
+1. Meccanismo tecnicamente plausibile (dedotto dall'Atlante).
+2. Sequenza effettivamente osservata e frequenza misurata (dati MCP / tre S0).
+Se mancano dati puntuali su una specifica interazione, dichiara il limite empirico e procedi con un'inferenza tecnica condizionata.`
+            },
+            {
+                id: "sec-4",
+                number: "4",
+                title: "4. ESPANSIONE BILATERALE DELLA COLLISIONE",
+                status: "core",
+                badgeText: "CORE MCP",
+                v2Note: "Mantiene l'architettura a doppio canale (A→B, B→A e Interdipendenza) con formulazione ad alta densità operativa.",
+                content: `4. ESPANSIONE BILATERALE DELLA COLLISIONE
+4.1. CANALE A → B (Iniziativa di A)
+Parti dalle produzioni caratteristiche di A (individuate tramite PPR e TDI). Per ciascuna, definisci la situazione concreta imposta a B (spazio sottratto, tempo ridotto, altezza d'impatto scomoda, movimento forzato). Sviluppa le risposte realisticamente disponibili per B ed esamina se A, sul colpo successivo, può: mantenere il controllo, cambiare direzione, accelerare, cambiare fondamentale, avanzare a rete o se viene costretto a neutralizzare/difendere.
+
+4.2. CANALE B → A (Iniziativa di B)
+Inverti l'iniziativa: non limitarti a come B si difende da A, ma analizza cosa B può imporre autonomamente per disinnescare il funzionamento abituale di A alla radice.
+
+4.3. INTERDIPENDENZA FRA I DUE CANALI
+Collega i due canali: mostra come la minaccia generata in un canale modifichi preventivamente le scelte nell'altro (es. una risposta aggressiva sulla 2ª di servizio che forza il battitore a forzare la 1ª o a variare angoli riducendo la percentuale di prime in campo).`
+            },
+            {
+                id: "sec-5",
+                number: "5",
+                title: "5. ESPANSIONE ATTRAVERSO LE COMPONENTI DEL PUNTO",
+                status: "core",
+                badgeText: "CORE MCP",
+                v2Note: "Sequenza completa Servizio/Risposta → 3°/4° colpo → Scambio da fondo → Variazioni/Rete → Esito del punto (FE vs UFE indotto).",
+                content: `5. ESPANSIONE ATTRAVERSO LE COMPONENTI DEL PUNTO
+5.1. SERVIZIO E RISPOSTA
+Analizza l'interazione tra direzioni/rotazioni di 1ª e 2ª di servizio e le capacità del ribattitore di neutralizzare, togliere tempo, bloccare profondo o prendere l'iniziativa.
+
+5.2. TERZO E QUARTO COLPO (SNODO CRITICO)
+Studia come le condizioni lasciate dalla risposta determinino il 3° colpo del battitore e le opzioni del 4° colpo del ribattitore. Valuta se il controllo viene consolidato, neutralizzato, trasferito o ribaltato, considerando anche il 3° colpo come preparazione per la chiusura sul 5°.
+
+5.3. SCAMBIO DA FONDO E TRANSIZIONI D'ALA
+Espandi la collisione oltre la diagonale iniziale: analizza i pattern Diritto↔Diritto, Rovescio↔Rovescio, Diritto↔Rovescio, i cambi in lungolinea e le transizioni da contenimento a contrattacco.
+
+5.4. VARIAZIONI TECNICHE E RETE
+Valuta slice, palle corte, cambi di ritmo, angoli stretti e approcci a rete. Non fermarti alla dichiarazione dell'approccio a rete: esamina il colpo d'approccio, la qualità dei passanti/lob avversari e la sostenibilità della volée nella ripetizione.
+
+5.5. ESITO DEL PUNTO
+Classifica la chiusura prevalente delle sequenze: vincente diretto, errore forzato (FE), errore non forzato (UFE) indotto da pressione cumulativa, attacco neutralizzato o ribaltamento.`
+            },
+            {
+                id: "sec-6",
+                number: "6",
+                title: "6. RIPETIZIONE E PRINCIPIO LANSDORP (SOLIDITÀ DELLE CONTROMOSSE)",
+                status: "optimized",
+                badgeText: "OTTIMIZZATO v2.0",
+                v2Note: "Unifica la ripetizione (dentro il punto, tra punti e lungo i set) con lo stress-test di Robert Lansdorp aggiungendo il costo atletico oltre a quello tecnico.",
+                content: `6. RIPETIZIONE E PRINCIPIO LANSDORP (SOLIDITÀ DELLE CONTROMOSSE)
+Applica il criterio di Robert Lansdorp per testare ogni soluzione e contromossa sotto stress:
+- Continuità: affidabilità di esecuzione su grandi volumi.
+- Collocazione: precisione direzionale e di profondità richiesta.
+- Pressione: reale difficoltà inflitta all'avversario.
+- Costo tecnico e atletico: margini di rischio, equilibrio richiesto e dispendio fisico.
+- Ripetibilità: tenuta dell'efficacia dentro lo stesso punto, tra punti diversi (adattamento e lettura dell'avversario) e lungo l'arco dei set.`
+            },
+            {
+                id: "sec-7",
+                number: "7",
+                title: "7. RIDUZIONE ALLE ASIMMETRIE E FIRMA TECNICA DEL MATCH",
+                status: "optimized",
+                badgeText: "PONTE QUANTITATIVO v2.0",
+                v2Note: "Rimosso il divieto di traduzione economica della v1.1: la Firma Tecnica ora quantifica Hold %, Break %, fasce di scambio (1-4, 5-8, 9+) ed evoluzione dopo il 1° set.",
+                content: `7. RIDUZIONE ALLE ASIMMETRIE E FIRMA TECNICA DEL MATCH
+Filtra tutte le interazioni esplorate per isolare le asimmetrie dominanti: quelle attivabili più spesso, a minor costo tecnico per chi le esegue e a maggior costo di contromossa per chi le subisce.
+Traduci queste asimmetrie nella Firma Tecnica del Match specificando l'impatto atteso su:
+- Rendimento dei turni di battuta (Hold % atteso e punti gratuiti con la 1ª).
+- Vulnerabilità sulla 2ª di servizio e frequenza di accesso alle palle break (Break % atteso).
+- Distribuzione del dominio per fasce di lunghezza dello scambio (1–4 colpi vs 5–8 vs 9+).
+- Evoluzione temporale del match (impatto degli adattamenti tattici e del decadimento fisico dopo il 1° set).`
+            },
+            {
+                id: "sec-8",
+                number: "8",
+                title: "8. TRADUZIONE IN SEGNALI OPERATIVI E MERCATI BETTING [NUOVO IN v2.0]",
+                status: "new",
+                badgeText: "NUOVO IN v2.0",
+                v2Note: "Cuore del Betting Signal Engine: mappa la Firma Tecnica su Moneyline, Handicap, Over/Under, Set Betting, assegna il Grado di Confidenza (A/B/C) e i Trigger Live dei primi 4 game.",
+                content: `8. TRADUZIONE IN SEGNALI OPERATIVI E MERCATI BETTING [NUOVO IN v2.0]
+Converti rigorosamente la Firma Tecnica in indicazioni operative per i mercati di scommessa:
+
+8.1. MAPPATURA SUI MERCATI PRINCIPALI E SECONDARI
+- Mercato Esito Finale (Moneyline / Testa a Testa): identifica chi possiede il vantaggio strutturale e se la sua superiorità dipende da fondamenta stabili o da picchi ad alta varianza.
+- Mercato Handicap Giochi / Set: valuta se le collisioni al servizio/risposta favoriscono set lottati e tie-break (Handicap + favorevole allo sfavorito) oppure break multipli e parziali netti (Handicap - favorevole al favorito).
+- Mercato Over/Under Giochi & Tie-Break: deduci dalla dominanza dei complessi Servizio+1 vs Risposta se la partita tende strutturalmente ad allungarsi o a risolversi rapidamente.
+- Dinamiche di Set Betting e Scenari di Ribaltamento: indica se un giocatore ha uno stile ad alto costo fisico/tecnico che può dominare il 1° set ma deteriorarsi alla distanza (opportunità di ingresso dopo il 1° set).
+
+8.2. CLASSIFICAZIONE DEL SEGNALE E INDICE DI CONFIDENZA
+Assegna obbligatoriamente all'analisi uno dei seguenti tre gradi operativi:
+- GRADO A (Asimmetria Strutturale Netta — Segnale Forte): Un giocatore domina le collisioni ad alta frequenza con basso costo tecnico; l'avversario dispone solo di contromosse a basso margine (Lansdorp).
+- GRADO B (Vantaggio Condizionato / Live Betting Trigger): Il vantaggio esiste ma dipende da una variabile specifica da verificare (es. percentuale di prime in campo, tenuta del rovescio in lungolinea, velocità effettiva del campo).
+- GRADO C (Equilibrio ad Alta Varianza / NO BET): Le asimmetrie si compensano o dipendono da esecuzioni a basso margine non prevedibili con continuità.
+
+8.3. TRIGGER DI CONFERMA O INVALIDAZIONE LIVE (PRIMI 4 GAME)
+Specifica 2 o 3 indicatori visivi/statistici esatti da osservare nei primi 3–4 game del match per confermare che la collisione prevista si sta verificando in campo (o per abortire l'operazione se le condizioni reali smentiscono la tesi).`
+            },
+            {
+                id: "sec-9",
+                number: "9",
+                title: "9. REGOLE COMPORTAMENTALI DELL'ANALISTA (DIRETTIVE ANTI-BIAS)",
+                status: "optimized",
+                badgeText: "CONSOLIDATO v2.0",
+                v2Note: "Concentra in 4 direttive chirurgiche tutti i divieti anti-bias che nella v1.1 erano ripetuti in 6 sezioni diverse, liberando attenzione computazionale per l'LLM.",
+                content: `9. REGOLE COMPORTAMENTALI DELL'ANALISTA (DIRETTIVE ANTI-BIAS)
+- Autonomia di espansione: non fermarti al primo colpo né attendere input dell'utente; espandi autonomamente ogni ramo rilevante e interrompi quelli marginali o insostenibili.
+- Rifiuto della neutralità diplomatica: non cercare mai di assegnare un vantaggio per parte per apparire equilibrato. Se il confronto tecnico è sbilanciato, dichiaralo con nettezza.
+- Divieto di checklist meccanica: usa le categorie MCP per approfondire i nessi causali, non per compilare elenchi sterili.
+- Onestà epistemica: non inventare statistiche MCP né capacità non presenti in PPR/TDI; non usare punteggi numerici arbitrari inventati.`
+            },
+            {
+                id: "sec-10",
+                number: "10",
+                title: "10. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE",
+                status: "optimized",
+                badgeText: "8 SEZIONI OUTPUT v2.0",
+                v2Note: "Aggiunta la Sezione VIII obbligatoria nell'output dell'LLM dedicata alla Sintesi Operativa Betting, Grado del Segnale A/B/C e Trigger Live.",
+                content: `10. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE
+Articola l'output esattamente nelle seguenti 8 sezioni:
+I. Identità Tecnica del Confronto e Impatto Ambientale (Sistemi di gioco + filtro superficie/condizioni).
+II. Collisione Bilaterale Espansa (Sviluppo Canale A→B, Canale B→A e interdipendenze su Servizio, Risposta, 3°/4° colpo e Fondo).
+III. Continuazioni, Variazioni e Transizioni (Cambi d'ala, variazioni tecniche, approcci a rete ed esiti del punto).
+IV. Ripetizione, Adattamenti e Test di Lansdorp (Sostenibilità, costo tecnico/fisico e tenuta tra i set).
+V. Evidenze Empiriche e Limiti (Integrazione PPR, TDI, Atlante, tre S0 e dati MCP: osservato vs dedotto).
+VI. Asimmetrie Risultanti (Isolamento degli squilibri decisivi e del loro peso specifico).
+VII. Firma Tecnica del Match (Impatto su Hold %, Break %, lunghezza scambi ed evoluzione dei set).
+VIII. Sintesi Operativa Betting & Trigger Live (Mappatura mercati, Grado del Segnale A/B/C e indicatori Live dei primi 4 game).`
+            },
+            {
+                id: "sec-11",
+                number: "11",
+                title: "11. ISTRUZIONE FINALE DI ESECUZIONE",
+                status: "new",
+                badgeText: "COMPLETATO IN v2.0",
+                v2Note: "Ripristinata e completata la chiusura esecutiva che nella v1.1 risultava troncata ('Non fer...'), saldando l'intera catena causale dal colpo al mercato.",
+                content: `11. ISTRUZIONE FINALE DI ESECUZIONE
+Analizza ora il confronto assegnato applicando integralmente l'architettura v2.0.
+Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi le collisioni bilaterali secondo il modello MCP, spiega i meccanismi tramite l'Atlante, seleziona le contromosse sostenibili secondo il principio Lansdorp e traduci la Firma Tecnica del match in segnali operativi rigorosi per il betting. Non fermarti finché l'intera catena causale dal singolo colpo all'asimmetria di mercato non è stata completamente dimostrata.`
+            }
+        ];
+
+        // State
+        let isV2HighlightActive = false;
+        let currentViewMode = 'cards';
+
+        // ============================================================================
+        // 2. INITIALIZATION & RENDERING
+        // ============================================================================
+        function initApp() {
+            renderSections();
+            renderSidebarNav();
+            updateDynamicConfig();
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sectionsListContainer');
+            container.innerHTML = '';
+
+            PROMPT_SECTIONS.forEach((sec) => {
+                // Determine badge & classes based on status
+                let statusClass = '';
+                let badgeHtml = '';
+
+                if (sec.status === 'new') {
+                    statusClass = 'is-v2-new';
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                        <i class="fa-solid fa-bolt mr-1"></i>${sec.badgeText}
+                    </span>`;
+                } else if (sec.status === 'optimized') {
+                    statusClass = 'is-v2-opt';
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        <i class="fa-solid fa-arrow-up-right-dots mr-1"></i>${sec.badgeText}
+                    </span>`;
+                } else {
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-cyan-300 border border-slate-700">
+                        ${sec.badgeText}
+                    </span>`;
+                }
+
+                const card = document.createElement('div');
+                card.id = sec.id;
+                card.dataset.sectionTitle = sec.title.toLowerCase();
+                card.dataset.sectionContent = sec.content.toLowerCase();
+                card.className = `prompt-section-card rounded-xl border border-slate-800 bg-[#131c2e]/95 p-5 shadow-md transition-all duration-300 ${statusClass}`;
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/90 pb-3 mb-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-mono font-bold text-emerald-400">
+                                ${sec.number}
+                            </span>
+                            <h3 class="text-xs sm:text-sm font-bold text-white font-mono tracking-tight">
+                                ${escapeHtml(sec.title)}
+                            </h3>
+                            ${badgeHtml}
+                        </div>
+                        <button onclick="copySection('${sec.id}')" class="self-start sm:self-center shrink-0 px-2.5 py-1 rounded text-xs font-mono bg-slate-800/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700 hover:border-emerald-500/40 transition cursor-pointer">
+                            <i class="fa-regular fa-copy mr-1"></i>Copia Sezione ${sec.number}
+                        </button>
+                    </div>
+
+                    <!-- V2.0 Upgrade Explanation Banner (Visible when Mostra Novità v2.0 is active) -->
+                    <div class="v2-note-banner items-start gap-2.5 p-3 mb-3 rounded-lg bg-slate-950/90 border border-slate-700/80 text-xs text-slate-300">
+                        <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 shrink-0"></i>
+                        <div>
+                            <span class="font-bold text-white uppercase text-[10px] tracking-wider block mb-0.5">Nota Architetturale v2.0:</span>
+                            ${escapeHtml(sec.v2Note)}
+                        </div>
+                    </div>
+
+                    <!-- Verbatim Prompt Content -->
+                    <pre class="font-mono text-xs sm:text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed select-all">${escapeHtml(sec.content)}</pre>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function renderSidebarNav() {
+            const nav = document.getElementById('sectionNavList');
+            nav.innerHTML = '';
+
+            PROMPT_SECTIONS.forEach((sec) => {
+                let dotColor = 'bg-slate-600';
+                if (sec.status === 'new') dotColor = 'bg-emerald-400';
+                if (sec.status === 'optimized') dotColor = 'bg-amber-400';
+
+                const btn = document.createElement('button');
+                btn.onclick = () => scrollToSection(sec.id);
+                btn.className = "w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-800/80 text-slate-300 hover:text-white transition flex items-center justify-between gap-2 cursor-pointer group";
+                btn.innerHTML = `
+                    <span class="truncate font-mono text-[11px] group-hover:text-emerald-300 transition">
+                        ${escapeHtml(sec.title)}
+                    </span>
+                    <span class="w-2 h-2 rounded-full ${dotColor} shrink-0" title="${sec.badgeText}"></span>
+                `;
+                nav.appendChild(btn);
+            });
+        }
+
+        // ============================================================================
+        // 3. BUILD VERBATIM FULL PROMPT & DYNAMIC MATCH CONFIGURATION
+        // ============================================================================
+        function getBaseVerbatimPrompt(format = 'txt') {
+            const blocks = [PROMPT_HEADER];
+            PROMPT_SECTIONS.forEach(sec => {
+                blocks.push(sec.content);
+            });
+            return blocks.join('\n\n---\n\n');
+        }
+
+        function getMatchConfigBlock() {
+            const playerA = document.getElementById('cfgPlayerA').value.trim();
+            const playerB = document.getElementById('cfgPlayerB').value.trim();
+            const tournament = document.getElementById('cfgTournament').value.trim();
+            const cpi = document.getElementById('cfgCPI').value.trim();
+            const format = document.getElementById('cfgFormat').value.trim();
+            const odds = document.getElementById('cfgOdds').value.trim();
+            const notes = document.getElementById('cfgNotes').value.trim();
+
+            const hasAnyInput = playerA || playerB || tournament || cpi || format || odds || notes;
+            if (!hasAnyInput) return '';
+
+            let lines = [];
+            lines.push(`====================================================================`);
+            lines.push(`DATI DEL MATCH ASSEGNATO PER L'ANALISI (INPUT OPERATIVO)`);
+            lines.push(`====================================================================`);
+            if (playerA || playerB) {
+                lines.push(`- CONFRONTO: ${playerA || '[Giocatore A]'} vs ${playerB || '[Giocatore B]'}`);
+            }
+            if (tournament) {
+                lines.push(`- TORNEO E SUPERFICIE: ${tournament}`);
+            }
+            if (cpi) {
+                lines.push(`- CPI / VELOCITÀ E CONDIZIONI CAMPO: ${cpi}`);
+            }
+            if (format) {
+                lines.push(`- FORMATO INCONTRO: ${format}`);
+            }
+            if (odds) {
+                lines.push(`- QUOTE BOOKMAKER ATTUALI: ${odds}`);
+            }
+            if (notes) {
+                lines.push(`- NOTE DATI (MCP / PPR / TDI / TRE S0 / CONTESTO):\n${notes}`);
+            }
+            lines.push(`====================================================================`);
+            return lines.join('\n');
+        }
+
+        function getCompletePromptText() {
+            const basePrompt = getBaseVerbatimPrompt();
+            const matchBlock = getMatchConfigBlock();
+            if (matchBlock) {
+                return `${basePrompt}\n\n---\n\n${matchBlock}`;
+            }
+            return basePrompt;
+        }
+
+        function updateDynamicConfig() {
+            const matchBlock = getMatchConfigBlock();
+            const dynamicCard = document.getElementById('dynamicMatchCard');
+            const previewText = document.getElementById('dynamicMatchPreviewText');
+            const statusText = document.getElementById('cfgStatusText');
+            const rawOutput = document.getElementById('rawFullPromptOutput');
+            const charBadge = document.getElementById('charCountBadge');
+
+            if (matchBlock) {
+                dynamicCard.classList.remove('hidden');
+                previewText.textContent = matchBlock;
+                statusText.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse inline-block"></span>
+                    <span class="text-lime-300 font-semibold">Input Match attivo in coda al prompt</span>
+                `;
+            } else {
+                dynamicCard.classList.add('hidden');
+                previewText.textContent = '';
+                statusText.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
+                    <span>Nessun match configurato (Solo Prompt Master)</span>
+                `;
+            }
+
+            const fullText = getCompletePromptText();
+            rawOutput.textContent = fullText;
+            charBadge.textContent = `${fullText.length.toLocaleString('it-IT')} caratteri`;
+        }
+
+        function loadDemoMatch() {
+            document.getElementById('cfgPlayerA').value = 'Jannik Sinner';
+            document.getElementById('cfgPlayerB').value = 'Carlos Alcaraz';
+            document.getElementById('cfgTournament').value = 'ATP Masters 1000 — Hard Outdoor';
+            document.getElementById('cfgCPI').value = 'CPI 38.4 (Medio-Veloce, rimbalzo medio-alto)';
+            document.getElementById('cfgFormat').value = 'Best of 3 Set (2 su 3)';
+            document.getElementById('cfgOdds').value = 'ML: Sinner @1.75 / Alcaraz @2.15 | Over 22.5 @1.85';
+            document.getElementById('cfgNotes').value = '- Sinner: pressione costante sulla diagonale di rovescio, rendimento risposta 2ª >54%.\n- Alcaraz: variazioni drop shot + accelerazione inside-out di diritto, picchi ad alto dispendio.\n- Verifica tenuta servizio sulla 2ª di Alcaraz contro risposta anticipata di Sinner.';
+            updateDynamicConfig();
+            showToast('Match Demo caricato in coda al prompt!', 'info');
+        }
+
+        function clearMatchConfig() {
+            document.getElementById('cfgPlayerA').value = '';
+            document.getElementById('cfgPlayerB').value = '';
+            document.getElementById('cfgTournament').value = '';
+            document.getElementById('cfgCPI').value = '';
+            document.getElementById('cfgFormat').value = '';
+            document.getElementById('cfgOdds').value = '';
+            document.getElementById('cfgNotes').value = '';
+            updateDynamicConfig();
+            showToast('Configuratore Match ripristinato.', 'info');
+        }
+
+        // ============================================================================
+        // 4. COPY, EXPORT & UI INTERACTION FUNCTIONS
+        // ============================================================================
+        function copyToClipboard(text, successMessage) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+                showToast(successMessage, 'success');
+            } catch (err) {
+                showToast('Errore durante la copia negli appunti.', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function copyFullPrompt() {
+            const fullText = getCompletePromptText();
+            const hasMatch = Boolean(getMatchConfigBlock());
+            const msg = hasMatch
+                ? 'Prompt Master v2.0 + Input Match copiati negli appunti!'
+                : 'Prompt Master Tennis v2.0 integrale copiato negli appunti!';
+            copyToClipboard(fullText, msg);
+        }
+
+        function copyHeaderBlock() {
+            copyToClipboard(PROMPT_HEADER, 'Intestazione del Prompt copiata!');
+        }
+
+        function copySection(sectionId) {
+            const sec = PROMPT_SECTIONS.find(s => s.id === sectionId);
+            if (!sec) return;
+            copyToClipboard(sec.content, `Sezione ${sec.number} copiata negli appunti!`);
+        }
+
+        function copyMatchBlockOnly() {
+            const matchBlock = getMatchConfigBlock();
+            if (!matchBlock) return;
+            copyToClipboard(matchBlock, 'Blocco Input Match copiato negli appunti!');
+        }
+
+        function downloadFile(extension) {
+            const fullText = getCompletePromptText();
+            let content = fullText;
+            let filename = `PROMPT_MASTER_TENNIS_v2.0.${extension}`;
+            let mimeType = 'text/plain;charset=utf-8';
+
+            if (extension === 'md') {
+                mimeType = 'text/markdown;charset=utf-8';
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast(`File ${filename} scaricato con successo!`, 'success');
+        }
+
+        function toggleV2Highlights() {
+            isV2HighlightActive = !isV2HighlightActive;
+            const container = document.getElementById('cardsViewContainer');
+            const btn = document.getElementById('btnToggleDiff');
+            const txt = document.getElementById('txtToggleDiff');
+
+            if (isV2HighlightActive) {
+                container.classList.add('v2-highlight-active');
+                btn.classList.remove('bg-amber-500/10', 'text-amber-300');
+                btn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
+                txt.textContent = 'Nascondi Novità v2.0';
+                showToast('Evidenziazione blocchi nuovi e ottimizzati v2.0 attivata.', 'info');
+            } else {
+                container.classList.remove('v2-highlight-active');
+                btn.classList.add('bg-amber-500/10', 'text-amber-300');
+                btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
+                txt.textContent = 'Mostra Novità v2.0';
+            }
+        }
+
+        function switchViewMode(mode) {
+            currentViewMode = mode;
+            const cardsView = document.getElementById('cardsViewContainer');
+            const rawView = document.getElementById('rawViewContainer');
+            const tabCards = document.getElementById('tabViewCards');
+            const tabRaw = document.getElementById('tabViewRaw');
+
+            if (mode === 'cards') {
+                cardsView.classList.remove('hidden');
+                rawView.classList.add('hidden');
+                tabCards.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer";
+                tabRaw.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer";
+            } else {
+                cardsView.classList.add('hidden');
+                rawView.classList.remove('hidden');
+                tabRaw.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer";
+                tabCards.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer";
+            }
+        }
+
+        function filterSections() {
+            const query = document.getElementById('searchPromptInput').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('btnClearSearch');
+            const cards = document.querySelectorAll('.prompt-section-card');
+
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+                if (currentViewMode !== 'cards') switchViewMode('cards');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            cards.forEach(card => {
+                const title = card.dataset.sectionTitle || '';
+                const content = card.dataset.sectionContent || '';
+                if (!query || title.includes(query) || content.includes(query)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        function clearSearch() {
+            document.getElementById('searchPromptInput').value = '';
+            filterSections();
+        }
+
+        function scrollToSection(sectionId) {
+            if (currentViewMode !== 'cards') {
+                switchViewMode('cards');
+            }
+            const el = document.getElementById(sectionId);
+            if (!el) return;
+            const yOffset = -90;
+            const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+
+            // Brief pulse effect
+            el.classList.add('ring-2', 'ring-emerald-400');
+            setTimeout(() => {
+                el.classList.remove('ring-2', 'ring-emerald-400');
+            }, 1400);
+        }
+
+        // ============================================================================
+        // 5. UTILITIES & TOAST NOTIFICATIONS
+        // ============================================================================
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            let icon = 'fa-circle-check text-emerald-400';
+            let border = 'border-emerald-500/40';
+            if (type === 'info') {
+                icon = 'fa-circle-info text-cyan-400';
+                border = 'border-cyan-500/40';
+            } else if (type === 'error') {
+                icon = 'fa-triangle-exclamation text-rose-400';
+                border = 'border-rose-500/40';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900/95 backdrop-blur-md border ${border} text-xs font-medium text-white shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-sm"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 300);
+            }, 2800);
+        }
+
+        // Initialize on window load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
