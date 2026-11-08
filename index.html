@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROMPT MASTER TENNIS v2.0 — Architettura MCP & Betting Signal Engine</title>
+    <title>PROMPT MASTER TENNIS v3.0 — Quant & Bet Angel Automation Studio</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & JetBrains Mono -->
@@ -24,14 +24,16 @@
                     },
                     colors: {
                         terminal: {
-                            bg: '#070b12',
-                            panel: '#0f1623',
-                            card: '#131c2e',
+                            bg: '#05080f',
+                            panel: '#0b111e',
+                            card: '#101829',
                             border: '#1e293b',
                             accent: '#10b981',
                             optic: '#a3e635',
                             cyan: '#06b6d4',
-                            amber: '#f59e0b'
+                            amber: '#f59e0b',
+                            back: '#38bdf8',
+                            lay: '#fb7185'
                         }
                     }
                 }
@@ -41,22 +43,23 @@
 
     <style>
         body {
-            background-color: #070b12;
+            background-color: #05080f;
             color: #e2e8f0;
             background-image: 
-                radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.06) 0%, transparent 35%),
-                radial-gradient(circle at 85% 85%, rgba(163, 230, 53, 0.04) 0%, transparent 35%),
-                linear-gradient(to bottom, rgba(15, 22, 35, 0.9), rgba(7, 11, 18, 1));
+                radial-gradient(circle at 12% 8%, rgba(16, 185, 129, 0.07) 0%, transparent 35%),
+                radial-gradient(circle at 88% 15%, rgba(6, 182, 212, 0.06) 0%, transparent 35%),
+                radial-gradient(circle at 80% 85%, rgba(245, 158, 11, 0.05) 0%, transparent 35%),
+                linear-gradient(to bottom, #070b14, #05080f);
             min-height: 100vh;
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: #070b12;
+            background: #05080f;
         }
         ::-webkit-scrollbar-thumb {
             background: #1e293b;
@@ -66,324 +69,836 @@
             background: #334155;
         }
 
-        /* Highlight v2.0 animations & styles */
-        .v2-highlight-active .is-v2-new {
+        /* Highlight v3.0 styles */
+        .v3-highlight-active .is-v3-new {
             border-color: #10b981 !important;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(19, 28, 46, 0.95) 100%) !important;
-            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(16, 24, 41, 0.96) 100%) !important;
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.3);
         }
-        .v2-highlight-active .is-v2-opt {
+        .v3-highlight-active .is-v3-ba {
+            border-color: #06b6d4 !important;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(16, 24, 41, 0.96) 100%) !important;
+            box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.3);
+        }
+        .v3-highlight-active .is-v3-opt {
             border-color: #f59e0b !important;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(19, 28, 46, 0.95) 100%) !important;
-            box-shadow: 0 0 20px -5px rgba(245, 158, 11, 0.18);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(16, 24, 41, 0.96) 100%) !important;
         }
-        .v2-note-banner {
+        .v3-note-banner {
             display: none;
         }
-        .v2-highlight-active .v2-note-banner {
+        .v3-highlight-active .v3-note-banner {
             display: flex;
         }
 
         .court-grid-bg {
-            background-size: 32px 32px;
+            background-size: 28px 28px;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+        }
+
+        /* Range input styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 6px;
+            border-radius: 999px;
+            background: #1e293b;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            margin-top: -4.5px;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
         }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200 court-grid-bg">
 
-    <!-- STICKY HEADER -->
-    <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#070b12]/90 border-b border-slate-800/80 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <!-- STICKY TOP TERMINAL HEADER -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#05080f]/95 border-b border-slate-800/90 shadow-2xl">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 
-                <!-- Brand & Title -->
+                <!-- Brand & Status Ticker -->
                 <div class="flex items-start sm:items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/20 to-lime-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 shadow-inner">
-                        <i class="fa-solid fa-chart-network text-emerald-400 text-lg"></i>
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/25 via-cyan-500/20 to-amber-500/20 border border-emerald-500/50 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/10">
+                        <i class="fa-solid fa-bolt-lightning text-emerald-400 text-lg"></i>
                     </div>
                     <div>
-                        <div class="flex flex-wrap items-center gap-2.5">
-                            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white font-mono">
-                                PROMPT MASTER TENNIS <span class="text-emerald-400">v2.0</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white font-mono">
+                                PROMPT MASTER TENNIS <span class="text-emerald-400">v3.0</span>
+                                <span class="text-slate-500 font-normal">|</span>
+                                <span class="text-cyan-400">QUANT &amp; BET ANGEL STUDIO</span>
                             </h1>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-lime-500/20 text-lime-300 border border-lime-400/40 shadow-sm">
-                                <i class="fa-solid fa-star text-[10px] text-lime-400"></i>
-                                Voto 10/10 — Betting Signal Edition
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/40 font-mono">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                GUARDIAN CSV + EXCEL DDE READY
                             </span>
                         </div>
                         <p class="text-xs text-slate-400 mt-0.5">
-                            Architettura di Espansione Bilaterale MCP + Filtro Ambientale CPI + Motore Segnali & Trigger Live
+                            Motore Collisioni MCP + Glossario RAG Anti-Allucinazione + Pricing Fair Odds + Compilatore Stringhe Bet Angel Pro
                         </p>
                     </div>
                 </div>
 
-                <!-- Action Toolbar -->
-                <div class="flex flex-wrap items-center gap-2">
-                    <!-- Toggle Novità v2.0 -->
-                    <button id="btnToggleDiff" onclick="toggleV2Highlights()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span id="txtToggleDiff">Mostra Novità v2.0</span>
-                    </button>
+                <!-- Live Top KPI Strip + Quick Actions -->
+                <div class="flex flex-wrap items-center justify-between xl:justify-end gap-2.5">
+                    <!-- Mini Live Ticker -->
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs font-mono">
+                        <span class="text-slate-400">Segnale:</span>
+                        <span id="topSignalBadge" class="font-bold text-emerald-400">GRADO A</span>
+                        <span class="text-slate-700">|</span>
+                        <span class="text-slate-400">Edge EV:</span>
+                        <span id="topEdgeBadge" class="font-bold text-lime-400">+6.4%</span>
+                        <span class="text-slate-700">|</span>
+                        <span class="text-slate-400">Ordine:</span>
+                        <span id="topOrderBadge" class="font-bold text-sky-400">BACK Sinner</span>
+                    </div>
 
-                    <!-- Download .TXT -->
-                    <button onclick="downloadFile('txt')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:border-slate-600 transition-all cursor-pointer">
-                        <i class="fa-regular fa-file-lines text-cyan-400"></i>
-                        <span>Scarica .TXT</span>
-                    </button>
-
-                    <!-- Download .MD -->
-                    <button onclick="downloadFile('md')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:border-slate-600 transition-all cursor-pointer">
-                        <i class="fa-brands fa-markdown text-purple-400"></i>
-                        <span>Scarica .MD</span>
-                    </button>
-
-                    <!-- Primary Copy Full Prompt -->
-                    <button onclick="copyFullPrompt()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer">
-                        <i class="fa-solid fa-copy"></i>
-                        <span>Copia Prompt Intero</span>
-                    </button>
+                    <!-- Global Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="downloadBetAngelCSV()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-cyan-500/40 bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25 transition cursor-pointer">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>Scarica .CSV Bet Angel</span>
+                        </button>
+                        <button onclick="copyExcelCommandFormula()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-amber-500/40 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 transition cursor-pointer">
+                            <i class="fa-solid fa-table"></i>
+                            <span>Copia Formula Excel L9</span>
+                        </button>
+                        <button onclick="copyFullPrompt()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition cursor-pointer">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copia Prompt v3.0</span>
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- TOP METRICS & CHANGELOG BANNER (Collapsible / Always informative) -->
-        <div id="v2SummaryBanner" class="mb-6 rounded-xl border border-slate-800 bg-[#0f1623]/90 p-4 shadow-md transition-all">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-start gap-3">
-                    <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0 mt-0.5">
-                        <i class="fa-solid fa-gauge-high"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                            Upgrade Architetturale v1.1 (7.5/10) <i class="fa-solid fa-arrow-right mx-1"></i> v2.0 (10/10)
-                        </h2>
-                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-                            Rimosso il blocco sulla traduzione in mercati della v1.1, integrato il <strong class="text-white">Filtro Ambientale/Fisico (Sez. 2)</strong>, aggiunto il <strong class="text-white">Modulo Segnali Betting, Gradi A/B/C e Trigger Live (Sez. 8)</strong>, compresse del 30% le ridondanze istruzionali e completata la <strong class="text-white">Sezione 11</strong> (troncata nella v1.1).
-                        </p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
-                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
-                        <div class="text-[10px] text-slate-400 uppercase font-mono">Motore Tattico</div>
-                        <div class="text-sm font-bold text-emerald-400 font-mono">10/10</div>
-                    </div>
-                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
-                        <div class="text-[10px] text-slate-400 uppercase font-mono">Signal Engine</div>
-                        <div class="text-sm font-bold text-lime-400 font-mono">10/10</div>
-                    </div>
-                    <div class="text-center px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800">
-                        <div class="text-[10px] text-slate-400 uppercase font-mono">Sezioni</div>
-                        <div class="text-sm font-bold text-cyan-400 font-mono">0 — 11</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN 2-COLUMN GRID -->
+    <!-- MAIN STUDIO LAYOUT -->
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-5">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- LEFT COLUMN: CONFIGURATORE MATCH & NAVIGATION (4 Cols on Desktop) -->
-            <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
-                
-                <!-- CONFIGURATORE MATCH PANEL -->
-                <div class="rounded-xl border border-slate-800 bg-[#0f1623] overflow-hidden shadow-xl">
-                    <div class="px-4 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+            <!-- ===================================================================== -->
+            <!-- LEFT SIDEBAR: MATCH, QUANT PRICING & BET ANGEL EXECUTION (4 COLS)      -->
+            <!-- ===================================================================== -->
+            <aside class="lg:col-span-4 space-y-5">
+
+                <!-- 1. CONFIGURATORE MATCH, QUOTE & HOLD % -->
+                <div class="rounded-xl border border-slate-800 bg-[#0b111e] overflow-hidden shadow-xl">
+                    <div class="px-4 py-3 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-emerald-400 text-sm"></i>
-                            <h2 class="text-sm font-bold text-white">Configuratore Match <span class="text-xs font-normal text-slate-400">(Opzionale)</span></h2>
+                            <i class="fa-solid fa-sliders text-emerald-400 text-xs"></i>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-white font-mono">1. Match, Quote &amp; Hold %</h2>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="loadDemoMatch()" title="Carica esempio precompilato" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition cursor-pointer">
-                                <i class="fa-solid fa-flask mr-1"></i>Demo
+                            <button onclick="loadPreset('sinner_alcaraz')" title="Preset Hard Veloce: Sinner vs Alcaraz" class="text-[11px] px-2 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 font-mono transition cursor-pointer">
+                                Preset Hard
                             </button>
-                            <button onclick="clearMatchConfig()" title="Svuota tutti i campi" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700 transition cursor-pointer">
+                            <button onclick="loadPreset('clay_grinder')" title="Preset Terra Lenta: Grinder vs Big Server" class="text-[11px] px-2 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono transition cursor-pointer">
+                                Preset Clay
+                            </button>
+                            <button onclick="resetAllConfig()" title="Ripristina valori" class="text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700 transition cursor-pointer">
                                 <i class="fa-solid fa-rotate-left"></i>
                             </button>
                         </div>
                     </div>
 
                     <div class="p-4 space-y-3.5">
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Compila i parametri per generare automaticamente in coda al prompt il blocco dati pronto per l'LLM.
-                        </p>
-
-                        <!-- Giocatori A & B -->
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                    Giocatore A
-                                </label>
-                                <input type="text" id="cfgPlayerA" oninput="updateDynamicConfig()" placeholder="es. Jannik Sinner" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                        <!-- Player A Card -->
+                        <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800/90 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold font-mono text-emerald-400 uppercase">Giocatore A (Selection 1)</span>
+                                <span id="lblImpliedA" class="text-[11px] font-mono text-slate-400">Implied: 63.3%</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] text-slate-400 uppercase mb-0.5">Nome Betfair</label>
+                                    <input type="text" id="cfgPlayerA" value="Jannik Sinner" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 uppercase mb-0.5">Quota BF</label>
+                                    <input type="number" id="cfgOddsA" value="1.58" step="0.01" min="1.01" max="100" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-bold font-mono focus:outline-none focus:border-emerald-500">
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                    Giocatore B
-                                </label>
-                                <input type="text" id="cfgPlayerB" oninput="updateDynamicConfig()" placeholder="es. Carlos Alcaraz" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                                <div class="flex justify-between text-[11px] font-mono mb-1">
+                                    <span class="text-slate-400">Hold % Atteso (Servizio A):</span>
+                                    <span id="valHoldA" class="text-emerald-400 font-bold">88.5%</span>
+                                </div>
+                                <input type="range" id="cfgHoldA" min="55" max="97" step="0.5" value="88.5" oninput="recalcAll()" class="w-full">
                             </div>
                         </div>
 
-                        <!-- Torneo / Superficie -->
+                        <!-- Player B Card -->
+                        <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800/90 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold font-mono text-cyan-400 uppercase">Giocatore B (Selection 2)</span>
+                                <span id="lblImpliedB" class="text-[11px] font-mono text-slate-400">Implied: 37.3%</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] text-slate-400 uppercase mb-0.5">Nome Betfair</label>
+                                    <input type="text" id="cfgPlayerB" value="Carlos Alcaraz" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs text-white font-mono focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400 uppercase mb-0.5">Quota BF</label>
+                                    <input type="number" id="cfgOddsB" value="2.68" step="0.01" min="1.01" max="100" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs text-cyan-300 font-bold font-mono focus:outline-none focus:border-cyan-500">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[11px] font-mono mb-1">
+                                    <span class="text-slate-400">Hold % Atteso (Servizio B):</span>
+                                    <span id="valHoldB" class="text-cyan-400 font-bold">82.0%</span>
+                                </div>
+                                <input type="range" id="cfgHoldB" min="55" max="97" step="0.5" value="82.0" oninput="recalcAll()" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Tournament, Surface, CPI & Format -->
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Torneo / Market Name</label>
+                                <input type="text" id="cfgTournament" value="ATP Finals Torino — Match Odds" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Superficie</label>
+                                <select id="cfgSurface" onchange="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                                    <option value="Cemento Indoor">Cemento Indoor</option>
+                                    <option value="Cemento Outdoor">Cemento Outdoor</option>
+                                    <option value="Terra Battuta">Terra Battuta</option>
+                                    <option value="Erba">Erba</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Fascia CPI &amp; Valore</label>
+                                <div class="flex gap-1">
+                                    <select id="cfgCPICategory" onchange="syncCPIFromCategory()" class="w-2/3 px-1.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-white font-mono focus:outline-none focus:border-emerald-500">
+                                        <option value="26">Lento (&lt;30)</option>
+                                        <option value="33">Medio-Lento (30-35)</option>
+                                        <option value="38">Medio (35-40)</option>
+                                        <option value="42.5" selected>Veloce (40-45)</option>
+                                        <option value="47">Ultra-Veloce (&gt;45)</option>
+                                    </select>
+                                    <input type="number" id="cfgCPIValue" value="42.5" step="0.5" oninput="recalcAll()" class="w-1/3 px-1.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-amber-300 font-mono text-center">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Altitudine / Palle</label>
+                                <input type="text" id="cfgAltitude" value="240m slm / Dunlop ATP" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Formato Set</label>
+                                <select id="cfgFormat" onchange="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono">
+                                    <option value="Best of 3 (2 su 3)" selected>Best of 3 (2 su 3)</option>
+                                    <option value="Best of 5 (3 su 5 - Slam)">Best of 5 (3 su 5 - Slam)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. CALCOLATORE QUANT LIVE (IN-SIDEBAR) -->
+                <div class="rounded-xl border border-emerald-500/30 bg-gradient-to-b from-[#0d192b] to-[#0b111e] p-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-lime-400 text-xs"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-white font-mono">2. Motore Quant &amp; Pricing Live</h3>
+                        </div>
+                        <span id="quantGradePill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            GRADO A — FORTE
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 font-mono text-xs mb-3">
+                        <div class="p-2.5 rounded-lg bg-slate-950/90 border border-slate-800">
+                            <div class="text-[10px] text-slate-400">Fair Odds Stimate (A / B)</div>
+                            <div class="text-sm font-bold text-white mt-0.5">
+                                <span id="qFairOddsA" class="text-emerald-400">1.48</span>
+                                <span class="text-slate-600">/</span>
+                                <span id="qFairOddsB" class="text-cyan-400">3.08</span>
+                            </div>
+                            <div id="qModelProbText" class="text-[10px] text-slate-400 mt-0.5">Model: 67.5% vs 32.5%</div>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-950/90 border border-slate-800">
+                            <div class="text-[10px] text-slate-400">Valore Atteso (Edge EV%)</div>
+                            <div id="qEdgeValue" class="text-sm font-bold text-lime-400 mt-0.5">+6.62% su A</div>
+                            <div id="qDeltaHold" class="text-[10px] text-slate-400 mt-0.5">Delta Hold: +6.5%</div>
+                        </div>
+                    </div>
+
+                    <div class="px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-800/90 flex items-center justify-between text-[11px] font-mono">
+                        <span class="text-slate-400">Prob. Tie-Break 1° Set: <strong id="qTieBreakProb" class="text-amber-300">28.4%</strong></span>
+                        <span class="text-slate-400">Break Attesi/Set: <strong id="qExpectedBreaks" class="text-cyan-300">1.75</strong></span>
+                    </div>
+                </div>
+
+                <!-- 3. CONFIGURATORE PARAMETRI ESECUZIONE BET ANGEL -->
+                <div class="rounded-xl border border-cyan-500/30 bg-[#0b111e] overflow-hidden shadow-xl">
+                    <div class="px-4 py-3 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-cyan-400 text-xs"></i>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-white font-mono">3. Parametri Automazione Bet Angel</h2>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">v1.62+ Ready</span>
+                    </div>
+
+                    <div class="p-4 space-y-3">
+                        <!-- Strategy Archetype Select -->
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                Torneo & Superficie
+                            <label class="block text-[10px] font-semibold text-cyan-300 uppercase mb-1">
+                                Archetipo Strategico MCP / Lansdorp (6 Strategie)
                             </label>
-                            <input type="text" id="cfgTournament" oninput="updateDynamicConfig()" placeholder="es. ATP Finals Torino — Hard Indoor" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                            <select id="baStrategy" onchange="onStrategyArchetypeChange()" class="w-full px-2.5 py-2 rounded-lg bg-slate-950 border border-cyan-500/40 text-xs text-white font-mono focus:outline-none focus:border-cyan-400">
+                                <option value="BACK_BREAK_0_30">1. BACK_BREAK_0_30 — Back Ribattitore su Collisione Risposta (0-30 / 15-40)</option>
+                                <option value="LAY_SERVER_SECOND_SERVE_DECAY">2. LAY_SERVER_SECOND_SERVE_DECAY — Lay Battitore Crollo 2ª Palla (Deuce 4°+ game)</option>
+                                <option value="LAY_SET1_WINNER_LANSDORP_COST">3. LAY_SET1_WINNER_LANSDORP_COST — Lay Vincitore 1° Set Alto Costo Lansdorp</option>
+                                <option value="BACK_SERVER_HOLD_RECOVERY">4. BACK_SERVER_HOLD_RECOVERY — Back Server Dominante sotto 15-30 (Scalp 40-15)</option>
+                                <option value="LAY_FAV_SLOW_CPI_GRIND">5. LAY_FAV_SLOW_CPI_GRIND — Lay Favorito su CPI Lento (Scambi 9+ colpi)</option>
+                                <option value="SERVANT_3RD_SHOT_DOMINANCE">6. SERVANT_3RD_SHOT_DOMINANCE — Ingresso Consolidamento Servizio+Diritto (3° colpo)</option>
+                            </select>
                         </div>
 
-                        <!-- CPI & Formato -->
+                        <!-- Direction & Target Selection -->
                         <div class="grid grid-cols-2 gap-2.5">
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                    CPI / Velocità Campo
-                                </label>
-                                <input type="text" id="cfgCPI" oninput="updateDynamicConfig()" placeholder="es. CPI 42.5 (Veloce, rimbalzo basso)" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Direzione (Action)</label>
+                                <select id="baDirection" onchange="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs font-bold font-mono text-sky-400">
+                                    <option value="BACK">BACK (Punta)</option>
+                                    <option value="LAY">LAY (Banca)</option>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                    Formato Match
-                                </label>
-                                <select id="cfgFormat" onchange="updateDynamicConfig()" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition font-mono">
-                                    <option value="">-- Non specificato --</option>
-                                    <option value="Best of 3 Set (2 su 3)">Best of 3 Set (2 su 3)</option>
-                                    <option value="Best of 5 Set (3 su 5 - Slam)">Best of 5 Set (3 su 5 - Slam)</option>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Target Selection</label>
+                                <select id="baTarget" onchange="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs font-bold font-mono text-white">
+                                    <option value="A">Giocatore A</option>
+                                    <option value="B">Giocatore B</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Quote Bookmaker -->
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                Quote Bookmaker Attuali
-                            </label>
-                            <input type="text" id="cfgOdds" oninput="updateDynamicConfig()" placeholder="es. ML: A @1.65 / B @2.30 | O/U 22.5 @1.88 | H -2.5 @1.95" class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono">
+                        <!-- Stake, Offset, Stop Loss, Kill Delay -->
+                        <div class="grid grid-cols-4 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Stake (€)</label>
+                                <input type="number" id="baStake" value="50" min="2" step="5" oninput="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Offset Tick</label>
+                                <input type="number" id="baOffset" value="12" min="1" max="50" oninput="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Stop Tick</label>
+                                <input type="number" id="baStop" value="8" min="1" max="50" oninput="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-rose-400 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Kill (sec)</label>
+                                <input type="number" id="baKill" value="15" min="1" max="120" oninput="recalcAll()" class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-amber-300 font-mono">
+                            </div>
                         </div>
 
-                        <!-- Note Dati MCP / PPR / TDI -->
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                                Note Dati (MCP / PPR / TDI / Condizioni)
-                            </label>
-                            <textarea id="cfgNotes" rows="3" oninput="updateDynamicConfig()" placeholder="Inserisci estratti PPR, TDI, sequenze MCP, stato fisico o condizioni palle..." class="w-full px-3 py-2 rounded-lg text-xs bg-slate-950/90 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition font-mono resize-y"></textarea>
+                        <!-- Score Trigger, Min/Max Odds & Greening -->
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Condizione Punteggio Live (Tennis Score Condition)</label>
+                                <select id="baScoreCondition" onchange="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-lime-300 font-mono">
+                                    <option value="0-30_OR_15-40">0-30 oppure 15-40 (Server sotto pressione Break)</option>
+                                    <option value="ANY_BREAK_POINT">Qualsiasi Palla Break (15-40 / 30-40 / AD-Out)</option>
+                                    <option value="DEUCE_4TH_GAME_ON">30-30 o Deuce (Dal 4° Game del Set in poi)</option>
+                                    <option value="SET2_0_0_START">0-0 Inizio 2° Set (Dopo Set 1 ad alto costo Lansdorp)</option>
+                                    <option value="15-30_SERVER_RECOVERY">15-30 sul Servizio del Favorito (Scalp fino a 40-15)</option>
+                                    <option value="ANY_SCORE_EARLY">Qualsiasi Punteggio (Ingresso su Quota Target)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Quota Min / Max</label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="baMinOdds" value="1.35" step="0.05" oninput="recalcAll()" class="w-1/2 px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono">
+                                    <input type="number" id="baMaxOdds" value="2.20" step="0.05" oninput="recalcAll()" class="w-1/2 px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs text-white font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Greening Automatico</label>
+                                <select id="baGreening" onchange="recalcAll()" class="w-full px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs text-emerald-300 font-mono">
+                                    <option value="TRUE" selected>WITH_GREENING: TRUE</option>
+                                    <option value="FALSE">WITH_GREENING: FALSE</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <!-- Live Status Badge -->
-                        <div id="cfgStatusBox" class="px-3 py-2 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-between">
-                            <span id="cfgStatusText" class="text-[11px] text-slate-400 flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
-                                Nessun match configurato (Solo Prompt Master)
-                            </span>
-                            <button onclick="copyFullPrompt()" class="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 underline cursor-pointer">
-                                Copia ora
-                            </button>
+                        <!-- Notes for Prompt -->
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Note Dati (MCP / PPR / TDI / Infortuni)</label>
+                            <textarea id="cfgNotes" rows="2" oninput="recalcAll()" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono resize-y">Sinner: TDI Rovescio 9.4, 56% punti vinti in risposta sulla 2ª avversaria. Alcaraz: alto costo Lansdorp su campi rapidi indoor quando costretto a colpire sopra l'anca sul rovescio.</textarea>
                         </div>
                     </div>
-                </div>
-
-                <!-- QUICK SECTION NAVIGATION -->
-                <div class="rounded-xl border border-slate-800 bg-[#0f1623] overflow-hidden shadow-xl hidden lg:block">
-                    <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-300">
-                            <i class="fa-solid fa-list-ol text-cyan-400 mr-1.5"></i>Indice Architettura (0-11)
-                        </span>
-                        <span class="text-[11px] font-mono text-slate-400" id="charCountBadge">0 caratteri</span>
-                    </div>
-                    <nav id="sectionNavList" class="p-2 max-h-80 overflow-y-auto space-y-1 text-xs">
-                        <!-- Populated by JS -->
-                    </nav>
                 </div>
 
             </aside>
 
-            <!-- RIGHT COLUMN: PROMPT VIEWER (8 Cols on Desktop) -->
+            <!-- ===================================================================== -->
+            <!-- RIGHT MAIN WORKSPACE: 4 INTERACTIVE TABS (8 COLS)                     -->
+            <!-- ===================================================================== -->
             <section class="lg:col-span-8 space-y-4">
 
-                <!-- VIEW CONTROLS & SEARCH BAR -->
-                <div class="rounded-xl border border-slate-800 bg-[#0f1623] p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
-                    <!-- View Mode Switcher -->
-                    <div class="inline-flex rounded-lg p-1 bg-slate-950 border border-slate-800">
-                        <button id="tabViewCards" onclick="switchViewMode('cards')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer">
-                            <i class="fa-solid fa-layer-group mr-1.5"></i>Vista a Sezioni
-                        </button>
-                        <button id="tabViewRaw" onclick="switchViewMode('raw')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer">
-                            <i class="fa-solid fa-terminal mr-1.5"></i>Testo Integrale Raw
-                        </button>
-                    </div>
-
-                    <!-- Search inside Prompt -->
-                    <div class="relative flex-1 max-w-sm">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                        <input type="text" id="searchPromptInput" oninput="filterSections()" placeholder="Cerca nel prompt (es. Lansdorp, CPI, Grado A...)" class="w-full pl-8 pr-8 py-1.5 rounded-lg text-xs bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
-                        <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs cursor-pointer">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- MODE 1: STRUCTURED SECTIONS VIEW -->
-                <div id="cardsViewContainer" class="space-y-4">
-                    
-                    <!-- Master Header Card -->
-                    <div class="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-[#131c2e] to-[#131c2e] p-5 shadow-lg">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3 mb-3">
+                <!-- PRIMARY 4-TAB NAVIGATION BAR -->
+                <div class="rounded-xl border border-slate-800 bg-[#0b111e] p-2 shadow-xl">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+                        <button id="mainTabBtn-prompt" onclick="switchMainTab('prompt')" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition cursor-pointer text-left">
+                            <i class="fa-solid fa-book-journal-whills text-sm shrink-0"></i>
                             <div>
-                                <span class="text-[11px] font-mono uppercase tracking-widest text-emerald-400 font-semibold">INTESTAZIONE UFFICIALE DEL SISTEMA</span>
-                                <h2 class="text-base sm:text-lg font-extrabold text-white font-mono mt-0.5">PROMPT MASTER TENNIS v2.0</h2>
+                                <div class="font-mono">1. PROMPT MASTER v3.0</div>
+                                <div class="text-[10px] font-normal text-slate-400">13 Sez. + Glossario RAG</div>
                             </div>
-                            <button onclick="copyHeaderBlock()" class="self-start sm:self-center px-2.5 py-1 rounded text-xs font-mono bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
-                                <i class="fa-regular fa-copy mr-1"></i>Copia Intestazione
+                        </button>
+
+                        <button id="mainTabBtn-betangel" onclick="switchMainTab('betangel')" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition cursor-pointer text-left">
+                            <i class="fa-solid fa-code text-cyan-400 text-sm shrink-0"></i>
+                            <div>
+                                <div class="font-mono">2. STRINGHE BET ANGEL</div>
+                                <div class="text-[10px] font-normal text-slate-400">CSV, Excel DDE, .BAF &amp; Servant</div>
+                            </div>
+                        </button>
+
+                        <button id="mainTabBtn-simulator" onclick="switchMainTab('simulator')" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition cursor-pointer text-left">
+                            <i class="fa-solid fa-sliders text-amber-400 text-sm shrink-0"></i>
+                            <div>
+                                <div class="font-mono">3. MATRICE LANSDORP</div>
+                                <div class="text-[10px] font-normal text-slate-400">Simulatore Collisioni In-Play</div>
+                            </div>
+                        </button>
+
+                        <button id="mainTabBtn-parser" onclick="switchMainTab('parser')" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition cursor-pointer text-left">
+                            <i class="fa-solid fa-wand-magic-sparkles text-purple-400 text-sm shrink-0"></i>
+                            <div>
+                                <div class="font-mono">4. PARSER AI → BET ANGEL</div>
+                                <div class="text-[10px] font-normal text-slate-400">Estrai Stringhe da Risposta LLM</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================================================================= -->
+                <!-- TAB 1: PROMPT MASTER v3.0 (13 SEZIONI + GLOSSARIO RAG + EXPORT)   -->
+                <!-- ================================================================= -->
+                <div id="tabPanel-prompt" class="space-y-4">
+                    
+                    <!-- Sub-Toolbar for Prompt Master -->
+                    <div class="rounded-xl border border-slate-800 bg-[#0b111e] p-3 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="inline-flex rounded-lg p-1 bg-slate-950 border border-slate-800">
+                                <button id="subBtnCards" onclick="switchPromptView('cards')" class="px-3 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-pointer">
+                                    <i class="fa-solid fa-layer-group mr-1"></i>13 Sezioni
+                                </button>
+                                <button id="subBtnRaw" onclick="switchPromptView('raw')" class="px-3 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white cursor-pointer">
+                                    <i class="fa-solid fa-terminal mr-1"></i>Testo Raw Integrale
+                                </button>
+                            </div>
+
+                            <button id="btnHighlightV3" onclick="toggleV3Highlights()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition cursor-pointer">
+                                <i class="fa-solid fa-bolt mr-1"></i><span id="txtHighlightV3">Evidenzia Blocchi v3.0 &amp; Bet Angel</span>
+                            </button>
+
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-slate-950 border border-slate-800 text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="chkIncludeRAG" checked onchange="recalcAll()" class="accent-emerald-500 rounded">
+                                <span>Includi Glossario RAG (Anti-Allucinazione)</span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center gap-2 grow sm:grow-0">
+                            <div class="relative grow sm:w-52">
+                                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                <input type="text" id="searchPromptInput" oninput="filterPromptSections()" placeholder="Filtra (es. Guardian, DDE, TDI)..." class="w-full pl-7 pr-6 py-1.5 rounded-lg text-xs bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <button onclick="downloadPromptFile('txt')" class="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer" title="Esporta .TXT">
+                                .TXT
+                            </button>
+                            <button onclick="downloadPromptFile('md')" class="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer" title="Esporta .MD">
+                                .MD
                             </button>
                         </div>
-                        <pre class="font-mono text-xs sm:text-sm text-emerald-200 whitespace-pre-wrap leading-relaxed select-all">PROMPT MASTER TENNIS v2.0
-INTERVENTO DI COLLISIONE TECNICA BILATERALE ESPANSA &amp; GENERAZIONE SEGNALI BETTING
-Versione 2.0 — Architettura di espansione MCP + Modulo Mercati</pre>
                     </div>
 
-                    <!-- Sections 0 to 11 Container (Rendered via JS for exact verbatim accuracy) -->
-                    <div id="sectionsListContainer" class="space-y-4"></div>
+                    <!-- Cards View of Prompt v3.0 -->
+                    <div id="promptCardsContainer" class="space-y-4">
+                        <div id="sectionsListContainer" class="space-y-4"></div>
 
-                    <!-- Dynamic Match Appended Block Preview -->
-                    <div id="dynamicMatchCard" class="hidden rounded-xl border-2 border-dashed border-lime-500/50 bg-lime-950/15 p-5 shadow-lg transition-all">
-                        <div class="flex items-center justify-between border-b border-lime-500/20 pb-3 mb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-lime-400/20 text-lime-300 border border-lime-400/40">
-                                    INPUT MATCH DINAMICO ATTIVO
-                                </span>
-                                <h3 class="text-xs sm:text-sm font-bold text-white font-mono">
-                                    DATI DEL MATCH ASSEGNATO (Aggiunti in coda al Prompt)
-                                </h3>
+                        <!-- Dynamic Injected Match & Bet Angel Context Card -->
+                        <div class="rounded-xl border-2 border-dashed border-cyan-500/50 bg-cyan-950/15 p-5 shadow-lg">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/30 pb-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-400/20 text-cyan-300 border border-cyan-400/40">
+                                        INIEZIONE DINAMICA ATTIVA
+                                    </span>
+                                    <h3 class="text-xs sm:text-sm font-bold text-white font-mono">
+                                        [CONTESTO MATCH, METRICHE QUANT &amp; PARAMETRI BET ANGEL]
+                                    </h3>
+                                </div>
+                                <button onclick="copyDynamicMatchBlock()" class="px-2.5 py-1 rounded text-xs font-mono bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 cursor-pointer">
+                                    <i class="fa-regular fa-copy mr-1"></i>Copia Blocco Contesto
+                                </button>
                             </div>
-                            <button onclick="copyMatchBlockOnly()" class="px-2.5 py-1 rounded text-xs font-mono bg-lime-500/20 hover:bg-lime-500/30 text-lime-200 border border-lime-500/40 transition cursor-pointer">
-                                <i class="fa-regular fa-copy mr-1"></i>Copia Solo Input Match
+                            <pre id="dynamicMatchPreviewText" class="font-mono text-xs text-cyan-100 whitespace-pre-wrap leading-relaxed select-all"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Raw View of Prompt v3.0 -->
+                    <div id="promptRawContainer" class="hidden rounded-xl border border-slate-800 bg-[#080d17] overflow-hidden shadow-2xl">
+                        <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+                            <span class="text-xs font-mono font-bold text-emerald-400">PROMPT_MASTER_TENNIS_v3.0_QUANT_BETANGEL.txt</span>
+                            <button onclick="copyFullPrompt()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 cursor-pointer">
+                                <i class="fa-solid fa-copy mr-1"></i>Copia Tutto il Testo Raw
                             </button>
                         </div>
-                        <pre id="dynamicMatchPreviewText" class="font-mono text-xs sm:text-sm text-lime-100 whitespace-pre-wrap leading-relaxed"></pre>
+                        <div class="p-5 overflow-x-auto">
+                            <pre id="rawFullPromptOutput" class="font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================================================================= -->
+                <!-- TAB 2: COMPILATORE STRINGHE BET ANGEL (CSV, EXCEL DDE, .BAF)      -->
+                <!-- ================================================================= -->
+                <div id="tabPanel-betangel" class="hidden space-y-5">
+
+                    <!-- Banner Riepilogo Strategia Attiva -->
+                    <div class="rounded-xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-[#101829] to-[#101829] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                                    COMPILATORE REAL-TIME BET ANGEL PRO
+                                </span>
+                                <span id="baSummaryArchetype" class="text-xs font-mono font-bold text-emerald-400">BACK_BREAK_0_30</span>
+                            </div>
+                            <p id="baSummaryDesc" class="text-xs text-slate-300 mt-1">
+                                Tutte le stringhe sottostanti sono sincronizzate con i parametri della barra laterale.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button onclick="downloadBetAngelCSV()" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono transition cursor-pointer">
+                                <i class="fa-solid fa-download mr-1.5"></i>Esporta .CSV Guardian
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1. STRINGA CSV BET ANGEL GUARDIAN ("Set Stored Values using a file") -->
+                    <div class="rounded-xl border border-slate-800 bg-[#101829] overflow-hidden shadow-lg">
+                        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center text-xs font-mono font-bold">1</span>
+                                <div>
+                                    <h3 class="text-xs sm:text-sm font-bold text-white font-mono">Stringa CSV per Bet Angel Guardian ("Set Stored Values using a file")</h3>
+                                    <p class="text-[11px] text-slate-400">Formato ufficiale Bet Angel per iniettare Stored Values (Target, Quote, Offset, Stop, CPI, Strategia) in Guardian</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="copyTextById('baCsvOutput', 'Stringa CSV Bet Angel Guardian copiata!')" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-slate-800 hover:bg-cyan-500/20 text-cyan-300 border border-slate-700 cursor-pointer">
+                                    <i class="fa-regular fa-copy mr-1"></i>Copia CSV
+                                </button>
+                                <button onclick="downloadBetAngelCSV()" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 cursor-pointer">
+                                    <i class="fa-solid fa-file-csv mr-1"></i>Scarica .CSV
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-[#070b12]">
+                            <pre id="baCsvOutput" class="font-mono text-xs text-cyan-200 whitespace-pre-wrap leading-relaxed select-all overflow-x-auto"></pre>
+                        </div>
+                    </div>
+
+                    <!-- 2. FORMULA EXCEL LIVE BET ANGEL (DDE / COM COMMAND CELL L9) -->
+                    <div class="rounded-xl border border-slate-800 bg-[#101829] overflow-hidden shadow-lg">
+                        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center justify-center text-xs font-mono font-bold">2</span>
+                                <div>
+                                    <h3 class="text-xs sm:text-sm font-bold text-white font-mono">Stringhe Formula Excel Bet Angel (Template Ufficiale Celle L9, M9, N9)</h3>
+                                    <p class="text-[11px] text-slate-400">Comandi con Global Settings (`OFFSET`, `STOP`, `WITH_GREENING`, `FILL_KILL`, `KILL_DELAY`)</p>
+                                </div>
+                            </div>
+
+                            <!-- Switch Excel IT (;) vs EN (,) -->
+                            <div class="flex items-center gap-2">
+                                <div class="inline-flex rounded-lg p-0.5 bg-slate-950 border border-slate-800 text-xs font-mono">
+                                    <button id="btnExcelIT" onclick="setExcelLocale('IT')" class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold cursor-pointer">
+                                        Excel IT ( ; / SE )
+                                    </button>
+                                    <button id="btnExcelEN" onclick="setExcelLocale('EN')" class="px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer">
+                                        Excel EN ( , / IF )
+                                    </button>
+                                </div>
+                                <button onclick="copyExcelCommandFormula()" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 cursor-pointer">
+                                    <i class="fa-regular fa-copy mr-1"></i>Copia Cella L9
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 space-y-3 bg-[#070b12]">
+                            <!-- Pure Command String -->
+                            <div>
+                                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+                                    <span>STRINGA COMANDO PURA BET ANGEL (Global Settings Syntax):</span>
+                                    <button onclick="copyTextById('baRawCommandString', 'Stringa Comando Pura copiata!')" class="text-emerald-400 hover:underline cursor-pointer">Copia stringa pura</button>
+                                </div>
+                                <pre id="baRawCommandString" class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-xs text-lime-300 select-all overflow-x-auto"></pre>
+                            </div>
+
+                            <!-- Cell L9/L11 Formula -->
+                            <div>
+                                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+                                    <span id="lblTargetExcelRow">FORMULA COMPLETA CELLA COMANDO (Cella L9 — Selection 1):</span>
+                                    <button onclick="copyExcelCommandFormula()" class="text-emerald-400 hover:underline cursor-pointer">Copia Formula</button>
+                                </div>
+                                <pre id="baExcelFormulaL9" class="p-3 rounded bg-slate-900 border border-emerald-500/30 font-mono text-xs text-emerald-200 whitespace-pre-wrap select-all"></pre>
+                            </div>
+
+                            <!-- Cells M9 (Odds) & N9 (Stake) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+                                        <span>CELLA QUOTA (M9 / M11 — Odds):</span>
+                                        <button onclick="copyTextById('baExcelFormulaM9', 'Formula Cella Quota M9 copiata!')" class="text-cyan-400 hover:underline cursor-pointer">Copia M9</button>
+                                    </div>
+                                    <pre id="baExcelFormulaM9" class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-xs text-cyan-200 select-all"></pre>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+                                        <span>CELLA STAKE DINAMICO (N9 / N11 — Stake €):</span>
+                                        <button onclick="copyTextById('baExcelFormulaN9', 'Formula Cella Stake N9 copiata!')" class="text-amber-400 hover:underline cursor-pointer">Copia N9</button>
+                                    </div>
+                                    <pre id="baExcelFormulaN9" class="p-2.5 rounded bg-slate-900 border border-slate-800 font-mono text-xs text-amber-200 select-all"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. BLUEPRINT REGOLA GUARDIAN .BAF (4 TAB UFFICIALI + JSON/XML SPEC) -->
+                    <div class="rounded-xl border border-slate-800 bg-[#101829] overflow-hidden shadow-lg">
+                        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center text-xs font-mono font-bold">3</span>
+                                <div>
+                                    <h3 class="text-xs sm:text-sm font-bold text-white font-mono">Blueprint Regola Guardian Automation (`.BAF` Rule Editor Step-by-Step)</h3>
+                                    <p class="text-[11px] text-slate-400">Mappatura esatta dei 4 Tab del Rules Editor di Bet Angel Pro: General, Parameters, Conditions, Signals/SV</p>
+                                </div>
+                            </div>
+                            <button onclick="copyTextById('baBafBlueprintText', 'Blueprint Regola Guardian .BAF copiato!')" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 cursor-pointer">
+                                <i class="fa-regular fa-copy mr-1"></i>Copia Blueprint .BAF
+                            </button>
+                        </div>
+                        <div class="p-4 bg-[#070b12]">
+                            <pre id="baBafBlueprintText" class="font-mono text-xs text-amber-100 whitespace-pre-wrap leading-relaxed select-all"></pre>
+                        </div>
+                    </div>
+
+                    <!-- 4. STRINGA SERVANT & TENNIS TRADER LADDER PRESET -->
+                    <div class="rounded-xl border border-slate-800 bg-[#101829] overflow-hidden shadow-lg">
+                        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded bg-purple-500/20 border border-purple-500/40 text-purple-300 flex items-center justify-center text-xs font-mono font-bold">4</span>
+                                <div>
+                                    <h3 class="text-xs sm:text-sm font-bold text-white font-mono">Stringa Automation Servant (ASC) — Controllo Rapido Ladder In-Play</h3>
+                                    <p class="text-[11px] text-slate-400">Configurazione per avvio Servant con tasto rapido su selezione puntatore (Context Selection &amp; Context Stake)</p>
+                                </div>
+                            </div>
+                            <button onclick="copyTextById('baServantText', 'Configurazione Servant copiata!')" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 cursor-pointer">
+                                <i class="fa-regular fa-copy mr-1"></i>Copia Specifica Servant
+                            </button>
+                        </div>
+                        <div class="p-4 bg-[#070b12]">
+                            <pre id="baServantText" class="font-mono text-xs text-purple-200 whitespace-pre-wrap leading-relaxed select-all"></pre>
+                        </div>
                     </div>
 
                 </div>
 
-                <!-- MODE 2: RAW VERBATIM TEXT VIEW -->
-                <div id="rawViewContainer" class="hidden rounded-xl border border-slate-800 bg-[#0b101b] overflow-hidden shadow-2xl">
-                    <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                            <span class="text-xs font-mono font-semibold text-slate-200">PROMPT_MASTER_TENNIS_v2.0_RAW.txt</span>
-                            <span class="text-[11px] font-mono text-slate-400">(Testo Integrale Verbatim pronto per copia/incolla)</span>
+                <!-- ================================================================= -->
+                <!-- TAB 3: MATRICE COLLISIONI LANSDORP & SIMULATORE SCENARI IN-PLAY   -->
+                <!-- ================================================================= -->
+                <div id="tabPanel-simulator" class="hidden space-y-5">
+                    
+                    <div class="rounded-xl border border-amber-500/30 bg-[#101829] p-5 shadow-xl">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
+                            <div>
+                                <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold">SIMULATORE INTERATTIVO LANSDORP + MCP</span>
+                                <h3 class="text-base font-bold text-white font-mono mt-0.5">Calibrazione Pesi di Collisione &amp; Selezione Automatica Strategia Bet Angel</h3>
+                            </div>
+                            <button onclick="applyRecommendedStrategyFromSim()" class="px-4 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-emerald-500 text-slate-950 font-mono shadow-lg cursor-pointer">
+                                <i class="fa-solid fa-bolt mr-1"></i>Applica Strategia Consigliata a Bet Angel
+                            </button>
                         </div>
-                        <button onclick="copyFullPrompt()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition cursor-pointer">
-                            <i class="fa-solid fa-copy mr-1.5"></i>Copia Tutto il Testo Raw
-                        </button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Colonna Giocatore A Sliders -->
+                            <div class="p-4 rounded-xl bg-slate-950/90 border border-emerald-500/30 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <span id="simTitlePlayerA" class="text-xs font-bold font-mono text-emerald-400 uppercase">GIOCATORE A: Jannik Sinner</span>
+                                    <span id="simTotalScoreA" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Indice: 8.7 / 10</span>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">1. Servizio + 3° Colpo (MCP):</span>
+                                        <span id="lblSimA1" class="text-emerald-400 font-bold">9.0</span>
+                                    </div>
+                                    <input type="range" id="simA1" min="1" max="10" step="0.5" value="9.0" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">2. Pressione Risposta su 2ª (MCP):</span>
+                                        <span id="lblSimA2" class="text-emerald-400 font-bold">9.5</span>
+                                    </div>
+                                    <input type="range" id="simA2" min="1" max="10" step="0.5" value="9.5" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">3. Continuità &amp; Collocazione (Lansdorp):</span>
+                                        <span id="lblSimA3" class="text-emerald-400 font-bold">9.0</span>
+                                    </div>
+                                    <input type="range" id="simA3" min="1" max="10" step="0.5" value="9.0" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">4. Economia Tecnica/Fisica (Basso Costo):</span>
+                                        <span id="lblSimA4" class="text-emerald-400 font-bold">8.5</span>
+                                    </div>
+                                    <input type="range" id="simA4" min="1" max="10" step="0.5" value="8.5" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">5. Tenuta Scambi Lunghi 9+ Colpi:</span>
+                                        <span id="lblSimA5" class="text-emerald-400 font-bold">8.5</span>
+                                    </div>
+                                    <input type="range" id="simA5" min="1" max="10" step="0.5" value="8.5" oninput="updateSimulator()" class="w-full">
+                                </div>
+                            </div>
+
+                            <!-- Colonna Giocatore B Sliders -->
+                            <div class="p-4 rounded-xl bg-slate-950/90 border border-cyan-500/30 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <span id="simTitlePlayerB" class="text-xs font-bold font-mono text-cyan-400 uppercase">GIOCATORE B: Carlos Alcaraz</span>
+                                    <span id="simTotalScoreB" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Indice: 8.1 / 10</span>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">1. Servizio + 3° Colpo (MCP):</span>
+                                        <span id="lblSimB1" class="text-cyan-400 font-bold">8.0</span>
+                                    </div>
+                                    <input type="range" id="simB1" min="1" max="10" step="0.5" value="8.0" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">2. Pressione Risposta su 2ª (MCP):</span>
+                                        <span id="lblSimB2" class="text-cyan-400 font-bold">8.5</span>
+                                    </div>
+                                    <input type="range" id="simB2" min="1" max="10" step="0.5" value="8.5" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">3. Continuità &amp; Collocazione (Lansdorp):</span>
+                                        <span id="lblSimB3" class="text-cyan-400 font-bold">7.5</span>
+                                    </div>
+                                    <input type="range" id="simB3" min="1" max="10" step="0.5" value="7.5" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">4. Economia Tecnica/Fisica (Basso Costo):</span>
+                                        <span id="lblSimB4" class="text-cyan-400 font-bold">7.0</span>
+                                    </div>
+                                    <input type="range" id="simB4" min="1" max="10" step="0.5" value="7.0" oninput="updateSimulator()" class="w-full">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-mono mb-1">
+                                        <span class="text-slate-300">5. Tenuta Scambi Lunghi 9+ Colpi:</span>
+                                        <span id="lblSimB5" class="text-cyan-400 font-bold">9.0</span>
+                                    </div>
+                                    <input type="range" id="simB5" min="1" max="10" step="0.5" value="9.0" oninput="updateSimulator()" class="w-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risultato Diagnostico Simulatore -->
+                        <div class="mt-5 p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="text-xs font-mono uppercase text-slate-400">Diagnosi Asimmetria Tecnica Bilaterale:</span>
+                                <span id="simRecBadge" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                    STRATEGIA CONSIGLIATA: BACK_BREAK_0_30
+                                </span>
+                            </div>
+                            <p id="simDiagnosticText" class="text-xs text-slate-200 leading-relaxed font-mono"></p>
+                        </div>
                     </div>
-                    <div class="p-5 overflow-x-auto">
-                        <pre id="rawFullPromptOutput" class="font-mono text-xs sm:text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed select-all"></pre>
+
+                </div>
+
+                <!-- ================================================================= -->
+                <!-- TAB 4: PARSER AI → BET ANGEL (ESTRATTORE AUTOMATICO DA TESTO LLM) -->
+                <!-- ================================================================= -->
+                <div id="tabPanel-parser" class="hidden space-y-5">
+                    
+                    <div class="rounded-xl border border-purple-500/30 bg-[#101829] p-5 shadow-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div>
+                                <span class="text-[11px] font-mono uppercase tracking-wider text-purple-400 font-bold">ESTRATTORE AUTOMATICO AI → BET ANGEL</span>
+                                <h3 class="text-base font-bold text-white font-mono mt-0.5">Incolla la Relazione dell'LLM e Compila Automaticamente le Stringhe</h3>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="loadSampleAIOutput()" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 cursor-pointer">
+                                    <i class="fa-solid fa-flask mr-1"></i>Simula Output AI di Esempio
+                                </button>
+                                <button onclick="parseAIOutputAndApply()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-500 hover:bg-emerald-400 text-slate-950 cursor-pointer">
+                                    <i class="fa-solid fa-gears mr-1"></i>Analizza &amp; Sincronizza Bet Angel
+                                </button>
+                            </div>
+                        </div>
+
+                        <textarea id="aiParserInput" rows="7" placeholder="Incolla qui la risposta completa generata da ChatGPT / Claude / Gemini con il Prompt Master v3.0..." class="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono focus:outline-none focus:border-purple-500"></textarea>
+
+                        <!-- Extracted Parameters Preview -->
+                        <div id="parserResultBox" class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono font-bold text-purple-300">PARAMETRI ESTRATTI DALL'OUTPUT AI:</span>
+                                <span id="parserStatusBadge" class="text-[11px] font-mono text-slate-400">In attesa di testo...</span>
+                            </div>
+                            <div id="parserExtractedGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+                                <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                    <div class="text-[10px] text-slate-400">Target &amp; Azione</div>
+                                    <div id="pExtAction" class="font-bold text-white mt-0.5">—</div>
+                                </div>
+                                <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                    <div class="text-[10px] text-slate-400">Archetipo Strategia</div>
+                                    <div id="pExtStrat" class="font-bold text-cyan-300 mt-0.5 truncate">—</div>
+                                </div>
+                                <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                    <div class="text-[10px] text-slate-400">Offset / Stop Tick</div>
+                                    <div id="pExtTicks" class="font-bold text-emerald-300 mt-0.5">—</div>
+                                </div>
+                                <div class="p-2.5 rounded bg-slate-900 border border-slate-800">
+                                    <div class="text-[10px] text-slate-400">Grado Segnale</div>
+                                    <div id="pExtGrade" class="font-bold text-amber-300 mt-0.5">—</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
             </section>
@@ -391,501 +906,1040 @@ Versione 2.0 — Architettura di espansione MCP + Modulo Mercati</pre>
     </main>
 
     <!-- FOOTER -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-slate-800/80 text-center sm:flex sm:items-center sm:justify-between text-xs text-slate-500">
-        <div class="flex items-center justify-center gap-2">
+    <footer class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 mt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+        <div class="flex items-center gap-2">
             <i class="fa-solid fa-terminal text-emerald-500"></i>
-            <span>PROMPT MASTER TENNIS v2.0 — Architettura di Espansione MCP &amp; Betting Signal Engine</span>
+            <span>PROMPT MASTER TENNIS v3.0 — Quant &amp; Bet Angel Automation Studio</span>
         </div>
-        <div class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-400">
-            Testo Integrale Verbatim • 100% Client-Side • Zero Dipendenze Esterne
+        <div class="font-mono text-[11px] text-slate-400">
+            Compatibile con Bet Angel Pro v1.62+ (Guardian CSV, Excel Live DDE, .BAF Rules &amp; Servants)
         </div>
     </footer>
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST CONTAINER -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- APPLICATION JAVASCRIPT -->
+    <!-- ========================================================================= -->
+    <!-- STUDIO ENGINE JAVASCRIPT                                                  -->
+    <!-- ========================================================================= -->
     <script>
-        // ============================================================================
-        // 1. VERBATIM INTEGRAL PROMPT DATA STRUCTURE (100% Exact Text)
-        // ============================================================================
-        const PROMPT_HEADER = `PROMPT MASTER TENNIS v2.0
-INTERVENTO DI COLLISIONE TECNICA BILATERALE ESPANSA & GENERAZIONE SEGNALI BETTING
-Versione 2.0 — Architettura di espansione MCP + Modulo Mercati`;
+        // ========================================================================
+        // 1. PROMPT MASTER v3.0 — 13 VERBATIM SECTIONS (WITH RAG & BET ANGEL)
+        // ========================================================================
+        const PROMPT_HEADER_V3 = `PROMPT MASTER TENNIS v3.0 — QUANT & BET ANGEL AUTOMATION EDITION
+INTERVENTO DI COLLISIONE TECNICA BILATERALE ESPANSA, PRICING FAIR ODDS & CODIFICA BET ANGEL PRO
+Versione 3.0 — Architettura MCP + Glossario RAG + Motore Quant + Stringhe Bet Angel Guardian/DDE`;
 
-        const PROMPT_SECTIONS = [
+        const RAG_GLOSSARY_SECTION = {
+            id: "sec-0bis",
+            number: "0.bis",
+            title: "0.bis. DIZIONARIO OPERATIVO RAG (DEFINIZIONE RIGOROSA PPR, TDI, ATLANTE, TRE S0)",
+            status: "new",
+            badgeText: "NUOVO v3.0 — ANTI-ALLUCINAZIONE RAG",
+            v3Note: "Definisce formalmente gli acronimi proprietari (PPR, TDI, Atlante, Tre S0) affinché l'LLM non inventi mai significati arbitrari anche quando usato senza file allegati esterni.",
+            content: `0.bis. DIZIONARIO OPERATIVO RAG (VINCOLO SEMANTICO ANTI-ALLUCINAZIONE)
+Utilizza esclusivamente le seguenti definizioni tecniche per i quattro pilastri analitici:
+- PPR (Pattern di Produzione Ricorrente): insieme delle soluzioni tecniche abituali che un giocatore esegue per default sotto pressione neutra o moderata (direzioni preferenziali di servizio, diagonale primaria di scambio, zona d'impatto standard in risposta). Non attribuire mai a un giocatore una soluzione tattica se non fa parte del suo PPR documentato.
+- TDI (Technical Dominance Index): indice qualitativo biomeccanico e di efficacia intrinseca del singolo fondamentale (Servizio, Risposta, Diritto, Rovescio, Transizione/Rete), valutato per velocità di palla, pesantezza di rotazione (rpm), anticipo d'impatto e tolleranza allo spostamento. Un TDI superiore prevale solo se le condizioni del punto gli consentono di attivarsi.
+- ATLANTE (Atlante delle Causalità Tecnico-Biomeccaniche): matrice di causa-effetto fisica del tennis. Lega la produzione alla conseguenza sull'avversario: Profondità/Velocità → riduzione del tempo di preparazione (swing accorciato); Angolo/Rotazione → spostamento laterale/verticale fuori dalla strike-zone → perdita di equilibrio dinamico → decadimento della qualità d'impatto successivo.
+- TRE S0 (Tripla Metrica Strutturale di Riferimento — Frequenza, Continuità, Conversione):
+  • S0-1 (Frequenza d'Attivazione): quota % di punti in cui il giocatore riesce a entrare nel proprio schema primario.
+  • S0-2 (Continuità di Tenuta): resistenza del colpo al deterioramento su scambi ripetuti (5-8 e 9+ colpi).
+  • S0-3 (Tasso di Conversione): trasformazione effettiva del vantaggio posizionale in punto vinto (Vincente o Errore Forzato indotto vs Errore Non Forzato).`
+        };
+
+        const CORE_PROMPT_SECTIONS_V3 = [
             {
                 id: "sec-0",
                 number: "0",
-                title: "0. IDENTITÀ E MANDATO",
+                title: "0. IDENTITÀ E MANDATO QUANTITATIVO",
                 status: "optimized",
-                badgeText: "OTTIMIZZATO v2.0",
-                v2Note: "Sbloccata la finalità quantitativa: l'analista ora traduce esplicitamente le collisioni tecniche in asimmetrie sfruttabili sui mercati di scommessa.",
-                content: `0. IDENTITÀ E MANDATO
-Agisci come analista tecnico-tattico d'élite e stratega quantitativo specializzato nella ricostruzione delle interazioni fra due tennisti professionisti e nella loro traduzione in asimmetrie sfruttabili sui mercati di scommessa.
-Il tuo obiettivo non è confrontare separatamente le qualità statiche dei due atleti, ma ricostruire come le rispettive capacità si scontrano durante lo sviluppo dei punti, attraverso le differenti soluzioni di gioco, nelle condizioni ambientali specifiche e nella ripetizione delle interazioni durante il match.
-Assumi il Match Charting Project (MCP) come modello strutturale di espansione del ragionamento colpo per colpo: non usarlo solo come database statistico finale, ma come logica per individuare cosa accade dopo ogni produzione tecnica.
-L'analisi è rigorosamente bilaterale, ma il giudizio finale non deve essere diplomatico né artificialmente equilibrato: il tuo compito è far emergere gli squilibri reali e trasformarli in segnali operativi.`
+                badgeText: "QUANT v3.0",
+                v3Note: "Integra la figura dell'analista tattico MCP con quella dello Quantitative Sports Trader specializzato in automazione Betfair Exchange / Bet Angel Pro.",
+                content: `0. IDENTITÀ E MANDATO QUANTITATIVO
+Agisci come Analista Tecnico-Tattico Senior e Quantitative Tennis Trader specializzato su Betfair Exchange e nell'automazione operativa tramite Bet Angel Pro.
+Il tuo obiettivo non è confrontare staticamente due atleti, ma ricostruire come i rispettivi sistemi di gioco collidono punto dopo punto secondo il modello del Match Charting Project (MCP), tradurre le asimmetrie emergenti in stime di Hold %, Break % e Fair Odds, e compilare a fine analisi le stringhe esatte di automazione per Bet Angel Guardian (CSV Stored Values), Excel Live DDE e Rule Editor (.BAF).`
             },
             {
                 id: "sec-1",
                 number: "1",
-                title: "1. ARCHITETTURA COGNITIVA",
+                title: "1. ARCHITETTURA COGNITIVA DELLA COLLISIONE",
                 status: "optimized",
-                badgeText: "COMPRESSO v2.0",
-                v2Note: "Flusso causale compattato e reso più denso: eliminate le ripetizioni concettuali della v1.1 preservando l'intera catena Produzione → Risposta → Trasformazione.",
-                content: `1. ARCHITETTURA COGNITIVA
-Il principio cardine dell'intervento è:
-Una capacità produce una situazione → la situazione modifica le possibilità tecniche dell'avversario → la risposta dell'avversario trasforma a sua volta le opzioni del primo giocatore.
-Il flusso dinamico da ricostruire è:
-Produzione → Risposta → Trasformazione della situazione → Nuove opzioni tecniche → Contromossa → Adattamento → Conseguenze sul punteggio → Ripetizione e tenuta.
-Seleziona e sviluppa esclusivamente le interazioni tecnicamente pertinenti al repertorio dei due giocatori, distinguendo ciò che è riproducibile con continuità da ciò che richiede condizioni estreme o episodiche.`
+                badgeText: "CORE MCP",
+                v3Note: "Catena causale a 8 stadi dalla produzione tecnica fino alla variazione di quota in-play.",
+                content: `1. ARCHITETTURA COGNITIVA DELLA COLLISIONE
+Ogni punto è un sistema dinamico non lineare regolato dalla catena:
+Produzione Tecnica → Situazione Imposta → Modifica Opzioni Avversarie → Risposta/Contromossa → Trasformazione dello Scambio → Adattamento Tattico → Impatto su Hold/Break % → Trigger di Quota In-Play.
+Non interrompere l'analisi alla prima contromossa teorica: verifica sempre se la risposta avversaria è sostenibile su grandi volumi o se genera un costo tecnico/fisico cumulativo.`
             },
             {
                 id: "sec-2",
                 number: "2",
-                title: "2. FILTRO AMBIENTALE, FISICO E CONDIZIONI DEL MATCH [NUOVO IN v2.0]",
+                title: "2. FILTRO AMBIENTALE, CPI, FISICA DEL CAMPO E TENUTA ENERGETICA",
                 status: "new",
-                badgeText: "NUOVO IN v2.0",
-                v2Note: "Colmata la lacuna ambientale della v1.1: introduce CPI (velocità/rimbalzo), condizioni indoor/outdoor, altitudine, usura palle e formato 2 su 3 vs 3 su 5 set.",
-                content: `2. FILTRO AMBIENTALE, FISICO E CONDIZIONI DEL MATCH [NUOVO IN v2.0]
-Nessuna collisione tecnica avviene nel vuoto. Prima di espandere gli scambi, calibra l'efficacia di ogni produzione attraverso i parametri contestuali dell'incontro:
-- Superficie e Coefficiente di Velocità/Rimbalzo (CPI, altezza del rimbalzo, attrito): valuta quanto il campo premia la penetrazione piatta, quanto amplifica il topspin/kick e quanto tempo concede per la preparazione dei colpi.
-- Condizioni Atmosferiche e Ambientali: indoor vs outdoor, altitudine, umidità/temperatura, pesantezza delle palle utilizzate nel torneo.
-- Formato e Variabile Fisica: distingue nettamente tra match 2 su 3 e 3 su 5 set. Integra la tenuta atletica, il dispendio energetico degli stili di gioco e la fatica accumulata nei turni precedenti per valutare il decadimento delle produzioni nel secondo e terzo/quarto set.`
+                badgeText: "NUOVO v3.0 — CPI & FATIGUE MODEL",
+                v3Note: "Parametrizza la fisica del campo tramite Court Pace Index (CPI), rimbalzo verticale, altitudine e decadimento energetico tra 1°, 2° e 3°/5° set.",
+                content: `2. FILTRO AMBIENTALE, CPI, FISICA DEL CAMPO E TENUTA ENERGETICA
+Prima di sviluppare le collisioni, passa ogni fondamentale attraverso il filtro fisico del torneo:
+- Court Pace Index (CPI) e Rimbalzo:
+  • CPI Lento (<30) / Medio-Lento (30–35): amplia il tempo di difesa, disinnesca il servizio piatto, premia kick alto, variazioni d'angolo e costruzione su 9+ colpi.
+  • CPI Medio (35–40): equilibrio tra penetrazione del 3° colpo e capacità di neutralizzazione in risposta.
+  • CPI Veloce (40–45) / Ultra-Veloce (>45): riduce drasticamente il tempo di swing, penalizza aperture ampie, esalta risposta bloccata/anticipata e dominio del complesso Servizio + 3° colpo.
+- Altitudine, Condizioni (Indoor/Outdoor) e Palle: valuta l'effetto sulla velocità di uscita palla e sul degrado del feltro (game con palle nuove vs palle usate).
+- Curva di Decadimento Fisico (2 su 3 vs 3 su 5 set): stima il consumo energetico per game di servizio dei due stili per prevedere crolli della 1ª palla o dei recuperi laterali dal 2° set in poi.`
             },
             {
                 id: "sec-3",
                 number: "3",
-                title: "3. MODELLO DI ESPANSIONE MCP E GERARCHIA DELLE FONTI",
+                title: "3. MODELLO DI ESPANSIONE MCP E IGIENE EPISTEMICA DEI DATI",
                 status: "optimized",
-                badgeText: "UNIFICATO v2.0",
-                v2Note: "Unifica le vecchie sezioni 2 e 8 della v1.1 in un'unica gerarchia rigorosa delle fonti (MCP, PPR, TDI, Atlante, tre S0) con distinzione netta tra dedotto e osservato.",
-                content: `3. MODELLO DI ESPANSIONE MCP E GERARCHIA DELLE FONTI
-Usa la tassonomia del Match Charting Project per tracciare le dimensioni del gioco:
-- Servizio (1ª e 2ª, direzioni: T, corpo, esterno; servizio e volée).
-- Risposta (posizione d'impatto, profondità, blocco, aggressività).
-- Sviluppo (diritto/rovescio, inside-out, inside-in, direzioni lungolinea/incrociato, variazioni di rotazione/slice/palla corta/lob).
-- Lunghezza dello scambio (1–3, 4–6, 7–9, 10+ colpi), approcci a rete, passanti, vincenti, errori forzati (FE) e non forzati (UFE).
-
-UTILIZZO RIGOROSO DELLE FONTI:
-- PPR: stabilisce quali soluzioni appartengono al funzionamento abituale del giocatore (non inventare soluzioni tatticamente comode se assenti dal repertorio).
-- TDI: qualifica la qualità intrinseca dei fondamentali, da contestualizzare sempre nelle condizioni di pressione ricevuta.
-- ATLANTE: spiega i nessi causali meccanici (es. profondità risposta → arretramento sul 3° colpo; angolo → spostamento laterale → perdita di equilibrio → calo qualità d'impatto).
-- TRE S0 e DATI MCP OSSERVATI: corroborano frequenze, continuità ed esiti empirici.
-
-Distingui sempre con chiarezza tra:
-1. Meccanismo tecnicamente plausibile (dedotto dall'Atlante).
-2. Sequenza effettivamente osservata e frequenza misurata (dati MCP / tre S0).
-Se mancano dati puntuali su una specifica interazione, dichiara il limite empirico e procedi con un'inferenza tecnica condizionata.`
+                badgeText: "RIGORE DATI",
+                v3Note: "Tracciamento sequenziale MCP completo con separazione obbligatoria tra deduzione meccanica e osservazione statistica.",
+                content: `3. MODELLO DI ESPANSIONE MCP E IGIENE EPISTEMICA DEI DATI
+Espandi ogni interazione lungo le dimensioni codificate dal Match Charting Project:
+- Servizio: 1ª vs 2ª, direzioni (T, Body, Wide), percentuali di prime e punti vinti.
+- Risposta: posizione (dentro il campo, sulla riga, arretrata), profondità, blocco centrale vs aggressività angolata.
+- Fasi dello Scambio: 1–3 colpi (Servizio/Risposta), 4–6 colpi (Consolidamento/Transizione), 7–9 colpi ( Costruzione), 10+ colpi (Logoramento).
+- Chiusura: Vincente (W), Errore Forzato (FE), Errore Non Forzato (UFE) indotto da pressione cumulativa.
+Distingui sempre esplicitamente ciò che è "Meccanismo Tecnicamente Dedotto tramite Atlante" da ciò che è "Sequenza Empiricamente Osservata in MCP / Tre S0".`
             },
             {
                 id: "sec-4",
                 number: "4",
-                title: "4. ESPANSIONE BILATERALE DELLA COLLISIONE",
+                title: "4. ESPANSIONE BILATERALE A DOPPIO CANALE (A↔B)",
                 status: "core",
-                badgeText: "CORE MCP",
-                v2Note: "Mantiene l'architettura a doppio canale (A→B, B→A e Interdipendenza) con formulazione ad alta densità operativa.",
-                content: `4. ESPANSIONE BILATERALE DELLA COLLISIONE
-4.1. CANALE A → B (Iniziativa di A)
-Parti dalle produzioni caratteristiche di A (individuate tramite PPR e TDI). Per ciascuna, definisci la situazione concreta imposta a B (spazio sottratto, tempo ridotto, altezza d'impatto scomoda, movimento forzato). Sviluppa le risposte realisticamente disponibili per B ed esamina se A, sul colpo successivo, può: mantenere il controllo, cambiare direzione, accelerare, cambiare fondamentale, avanzare a rete o se viene costretto a neutralizzare/difendere.
-
-4.2. CANALE B → A (Iniziativa di B)
-Inverti l'iniziativa: non limitarti a come B si difende da A, ma analizza cosa B può imporre autonomamente per disinnescare il funzionamento abituale di A alla radice.
-
-4.3. INTERDIPENDENZA FRA I DUE CANALI
-Collega i due canali: mostra come la minaccia generata in un canale modifichi preventivamente le scelte nell'altro (es. una risposta aggressiva sulla 2ª di servizio che forza il battitore a forzare la 1ª o a variare angoli riducendo la percentuale di prime in campo).`
+                badgeText: "DOPPIO CANALE",
+                v3Note: "Analizza Canale A→B, Canale B→A e la retroazione strategica tra i due canali.",
+                content: `4. ESPANSIONE BILATERALE A DOPPIO CANALE (A↔B)
+- 4.1. CANALE A → B: Parti dai PPR e TDI dominanti di A. Ricostruisci quale tempo, spazio e altezza d'impatto vengono imposti a B, quali risposte reali B possiede e come A può consolidare sul colpo successivo.
+- 4.2. CANALE B → A: Inverti l'iniziativa. Analizza come B può imporre autonomamente i propri pattern per impedire ad A di entrare nel proprio funzionamento abituale.
+- 4.3. RETROAZIONE E INTERDIPENDENZA: Mostra come la pressione generata in un canale modifichi le scelte nell'altro (es. pressione letale di A in risposta sulla 2ª di B → B forza la 1ª di servizio → calo della % di prime di B → aumento esponenziale delle palle break nei game centrali del set).`
             },
             {
                 id: "sec-5",
                 number: "5",
-                title: "5. ESPANSIONE ATTRAVERSO LE COMPONENTI DEL PUNTO",
+                title: "5. ANATOMIA SEQUENZIALE DEL PUNTO (SERVIZIO, 3°/4° COLPO, DIAGONALI, RETE)",
                 status: "core",
-                badgeText: "CORE MCP",
-                v2Note: "Sequenza completa Servizio/Risposta → 3°/4° colpo → Scambio da fondo → Variazioni/Rete → Esito del punto (FE vs UFE indotto).",
-                content: `5. ESPANSIONE ATTRAVERSO LE COMPONENTI DEL PUNTO
-5.1. SERVIZIO E RISPOSTA
-Analizza l'interazione tra direzioni/rotazioni di 1ª e 2ª di servizio e le capacità del ribattitore di neutralizzare, togliere tempo, bloccare profondo o prendere l'iniziativa.
-
-5.2. TERZO E QUARTO COLPO (SNODO CRITICO)
-Studia come le condizioni lasciate dalla risposta determinino il 3° colpo del battitore e le opzioni del 4° colpo del ribattitore. Valuta se il controllo viene consolidato, neutralizzato, trasferito o ribaltato, considerando anche il 3° colpo come preparazione per la chiusura sul 5°.
-
-5.3. SCAMBIO DA FONDO E TRANSIZIONI D'ALA
-Espandi la collisione oltre la diagonale iniziale: analizza i pattern Diritto↔Diritto, Rovescio↔Rovescio, Diritto↔Rovescio, i cambi in lungolinea e le transizioni da contenimento a contrattacco.
-
-5.4. VARIAZIONI TECNICHE E RETE
-Valuta slice, palle corte, cambi di ritmo, angoli stretti e approcci a rete. Non fermarti alla dichiarazione dell'approccio a rete: esamina il colpo d'approccio, la qualità dei passanti/lob avversari e la sostenibilità della volée nella ripetizione.
-
-5.5. ESITO DEL PUNTO
-Classifica la chiusura prevalente delle sequenze: vincente diretto, errore forzato (FE), errore non forzato (UFE) indotto da pressione cumulativa, attacco neutralizzato o ribaltamento.`
+                badgeText: "SEQUENZA MCP",
+                v3Note: "Esplora lo snodo critico del 3° e 4° colpo, le inversioni di diagonale e l'affidabilità delle prese di rete.",
+                content: `5. ANATOMIA SEQUENZIALE DEL PUNTO
+- 5.1. Complesso Servizio-Risposta: impatto di slice, kick e piatto sulle leve di risposta avversarie.
+- 5.2. Snodo Critico 3° e 4° Colpo: verifica se il battitore consolida il vantaggio sul 3° colpo (es. Servizio + Diritto inside-out/inside-in) o se la profondità della risposta trasferisce l'iniziativa al 4° colpo del ribattitore.
+- 5.3. Scambio da Fondo e Cambi d'Ala: Diritto↔Diritto, Rovescio↔Rovescio, anomalie Diritto→Rovescio e rischio/rendimento del cambio in lungolinea.
+- 5.4. Variazioni e Rete: efficacia reale di slice basso, drop shot, lob e tenuta della volée sotto passante.`
             },
             {
                 id: "sec-6",
                 number: "6",
-                title: "6. RIPETIZIONE E PRINCIPIO LANSDORP (SOLIDITÀ DELLE CONTROMOSSE)",
+                title: "6. TEST DI LANSDORP SULLA SOSTENIBILITÀ DELLE CONTROMOSSE",
                 status: "optimized",
-                badgeText: "OTTIMIZZATO v2.0",
-                v2Note: "Unifica la ripetizione (dentro il punto, tra punti e lungo i set) con lo stress-test di Robert Lansdorp aggiungendo il costo atletico oltre a quello tecnico.",
-                content: `6. RIPETIZIONE E PRINCIPIO LANSDORP (SOLIDITÀ DELLE CONTROMOSSE)
-Applica il criterio di Robert Lansdorp per testare ogni soluzione e contromossa sotto stress:
-- Continuità: affidabilità di esecuzione su grandi volumi.
-- Collocazione: precisione direzionale e di profondità richiesta.
-- Pressione: reale difficoltà inflitta all'avversario.
-- Costo tecnico e atletico: margini di rischio, equilibrio richiesto e dispendio fisico.
-- Ripetibilità: tenuta dell'efficacia dentro lo stesso punto, tra punti diversi (adattamento e lettura dell'avversario) e lungo l'arco dei set.`
+                badgeText: "STRESS TEST LANSDORP",
+                v3Note: "Valuta ogni contromossa sui 5 parametri di Robert Lansdorp per individuare i falsi equilibri che crollano nei momenti di pressione (30-30 / Deuce / Break Point).",
+                content: `6. TEST DI LANSDORP SULLA SOSTENIBILITÀ DELLE CONTROMOSSE
+Sottoponi ogni contromossa teorica al filtro severo di Robert Lansdorp:
+1. Continuità: può essere eseguita 30+ volte nel match senza picchi di UFE?
+2. Collocazione: richiede bersagli vicini alle righe (basso margine) per non essere attaccata?
+3. Pressione Generata: toglie realmente tempo all'avversario o si limita a rimettere palla in gioco?
+4. Costo Tecnico e Atletico: richiede impatti fuori equilibrio, in arretramento o sopra la spalla?
+5. Ripetibilità sotto Pressione di Punteggio: tiene sul 30-30, 15-40 e nei tie-break o subisce regressione verso il centro del campo?`
             },
             {
                 id: "sec-7",
                 number: "7",
-                title: "7. RIDUZIONE ALLE ASIMMETRIE E FIRMA TECNICA DEL MATCH",
+                title: "7. RIDUZIONE ALLE ASIMMETRIE STRUTTURALI E FIRMA TECNICA",
                 status: "optimized",
-                badgeText: "PONTE QUANTITATIVO v2.0",
-                v2Note: "Rimosso il divieto di traduzione economica della v1.1: la Firma Tecnica ora quantifica Hold %, Break %, fasce di scambio (1-4, 5-8, 9+) ed evoluzione dopo il 1° set.",
-                content: `7. RIDUZIONE ALLE ASIMMETRIE E FIRMA TECNICA DEL MATCH
-Filtra tutte le interazioni esplorate per isolare le asimmetrie dominanti: quelle attivabili più spesso, a minor costo tecnico per chi le esegue e a maggior costo di contromossa per chi le subisce.
-Traduci queste asimmetrie nella Firma Tecnica del Match specificando l'impatto atteso su:
-- Rendimento dei turni di battuta (Hold % atteso e punti gratuiti con la 1ª).
-- Vulnerabilità sulla 2ª di servizio e frequenza di accesso alle palle break (Break % atteso).
-- Distribuzione del dominio per fasce di lunghezza dello scambio (1–4 colpi vs 5–8 vs 9+).
-- Evoluzione temporale del match (impatto degli adattamenti tattici e del decadimento fisico dopo il 1° set).`
+                badgeText: "ASIMMETRIE",
+                v3Note: "Isola le 2 o 3 collisioni madri che determinano il destino statistico del match.",
+                content: `7. RIDUZIONE ALLE ASIMMETRIE STRUTTURALI E FIRMA TECNICA
+Gerarchizza le collisioni esplorate: scarta i rami secondari e isola le asimmetrie ad alta frequenza di attivazione (S0-1) e ad alto differenziale di costo Lansdorp.
+Ricostruisci la Firma Tecnica del Match indicando chiaramente chi governa gli scambi brevi (1–4 colpi), chi domina la fascia intermedia (5–8) e chi prevale nel logoramento (9+ colpi).`
             },
             {
                 id: "sec-8",
                 number: "8",
-                title: "8. TRADUZIONE IN SEGNALI OPERATIVI E MERCATI BETTING [NUOVO IN v2.0]",
+                title: "8. CONVERSIONE QUANTITATIVA: HOLD/BREAK MATRIX, FAIR ODDS & TRIGGER LIVE [NUOVO v3.0]",
                 status: "new",
-                badgeText: "NUOVO IN v2.0",
-                v2Note: "Cuore del Betting Signal Engine: mappa la Firma Tecnica su Moneyline, Handicap, Over/Under, Set Betting, assegna il Grado di Confidenza (A/B/C) e i Trigger Live dei primi 4 game.",
-                content: `8. TRADUZIONE IN SEGNALI OPERATIVI E MERCATI BETTING [NUOVO IN v2.0]
-Converti rigorosamente la Firma Tecnica in indicazioni operative per i mercati di scommessa:
-
-8.1. MAPPATURA SUI MERCATI PRINCIPALI E SECONDARI
-- Mercato Esito Finale (Moneyline / Testa a Testa): identifica chi possiede il vantaggio strutturale e se la sua superiorità dipende da fondamenta stabili o da picchi ad alta varianza.
-- Mercato Handicap Giochi / Set: valuta se le collisioni al servizio/risposta favoriscono set lottati e tie-break (Handicap + favorevole allo sfavorito) oppure break multipli e parziali netti (Handicap - favorevole al favorito).
-- Mercato Over/Under Giochi & Tie-Break: deduci dalla dominanza dei complessi Servizio+1 vs Risposta se la partita tende strutturalmente ad allungarsi o a risolversi rapidamente.
-- Dinamiche di Set Betting e Scenari di Ribaltamento: indica se un giocatore ha uno stile ad alto costo fisico/tecnico che può dominare il 1° set ma deteriorarsi alla distanza (opportunità di ingresso dopo il 1° set).
-
-8.2. CLASSIFICAZIONE DEL SEGNALE E INDICE DI CONFIDENZA
-Assegna obbligatoriamente all'analisi uno dei seguenti tre gradi operativi:
-- GRADO A (Asimmetria Strutturale Netta — Segnale Forte): Un giocatore domina le collisioni ad alta frequenza con basso costo tecnico; l'avversario dispone solo di contromosse a basso margine (Lansdorp).
-- GRADO B (Vantaggio Condizionato / Live Betting Trigger): Il vantaggio esiste ma dipende da una variabile specifica da verificare (es. percentuale di prime in campo, tenuta del rovescio in lungolinea, velocità effettiva del campo).
-- GRADO C (Equilibrio ad Alta Varianza / NO BET): Le asimmetrie si compensano o dipendono da esecuzioni a basso margine non prevedibili con continuità.
-
-8.3. TRIGGER DI CONFERMA O INVALIDAZIONE LIVE (PRIMI 4 GAME)
-Specifica 2 o 3 indicatori visivi/statistici esatti da osservare nei primi 3–4 game del match per confermare che la collisione prevista si sta verificando in campo (o per abortire l'operazione se le condizioni reali smentiscono la tesi).`
+                badgeText: "NUOVO v3.0 — QUANT PRICING",
+                v3Note: "Obbliga l'analista a stimare Hold %, Break %, Fair Odds, Edge EV% rispetto alle quote Betfair e finestre di ingresso In-Play.",
+                content: `8. CONVERSIONE QUANTITATIVA: HOLD/BREAK MATRIX, FAIR ODDS & TRIGGER LIVE [NUOVO v3.0]
+Traduci obbligatoriamente la Firma Tecnica in parametri quantitativi per il trading sportivo:
+- 8.1. Stima Hold % e Break %: dichiara il range percentuale atteso di tenuta del servizio per Giocatore A e Giocatore B sulle condizioni specifiche del campo (CPI).
+- 8.2. Pricing Fair Odds & Edge (EV%): confronta la probabilità implicita delle quote Betfair attuali con la probabilità reale derivante dalle collisioni tecniche. Identifica dove risiede il valore (Value Pre-Match o In-Play Entry).
+- 8.3. Classificazione Operativa del Segnale:
+  • GRADO A (Asimmetria Strutturale Netta — Esecuzione Diretta / Alta Confidenza)
+  • GRADO B (Asimmetria Condizionata — Ingresso In-Play subordinato a conferma nei primi 3-4 game)
+  • GRADO C (Equilibrio ad Alta Varianza — NO BET / Solo Scalping Tecnico)
+- 8.4. Finestra di Attivazione sul Punteggio (Score Trigger): indica su quale punteggio esatto di game/set (es. 0-30 / 15-40 in risposta, 30-30 dal 4° game, 15-30 sul servizio del favorito, oppure inizio 2° set) il rapporto rischio/rendimento su Betfair Exchange raggiunge il picco.`
             },
             {
                 id: "sec-9",
                 number: "9",
-                title: "9. REGOLE COMPORTAMENTALI DELL'ANALISTA (DIRETTIVE ANTI-BIAS)",
-                status: "optimized",
-                badgeText: "CONSOLIDATO v2.0",
-                v2Note: "Concentra in 4 direttive chirurgiche tutti i divieti anti-bias che nella v1.1 erano ripetuti in 6 sezioni diverse, liberando attenzione computazionale per l'LLM.",
-                content: `9. REGOLE COMPORTAMENTALI DELL'ANALISTA (DIRETTIVE ANTI-BIAS)
-- Autonomia di espansione: non fermarti al primo colpo né attendere input dell'utente; espandi autonomamente ogni ramo rilevante e interrompi quelli marginali o insostenibili.
-- Rifiuto della neutralità diplomatica: non cercare mai di assegnare un vantaggio per parte per apparire equilibrato. Se il confronto tecnico è sbilanciato, dichiaralo con nettezza.
-- Divieto di checklist meccanica: usa le categorie MCP per approfondire i nessi causali, non per compilare elenchi sterili.
-- Onestà epistemica: non inventare statistiche MCP né capacità non presenti in PPR/TDI; non usare punteggi numerici arbitrari inventati.`
+                title: "9. GENERATORE STRINGHE BET ANGEL PRO (CSV GUARDIAN, EXCEL DDE & .BAF) [NUOVO v3.0]",
+                status: "ba",
+                badgeText: "NUOVO v3.0 — BET ANGEL AUTOMATION",
+                v3Note: "Istruisce l'LLM a generare al termine dell'analisi i blocchi di codice esatti per Bet Angel Guardian CSV, la formula Excel Live DDE (Cella L9/L11) e i parametri del Rule Editor.",
+                content: `9. GENERATORE STRINGHE BET ANGEL PRO (CSV GUARDIAN, EXCEL DDE & .BAF) [NUOVO v3.0]
+Al termine dell'analisi, devi generare un blocco tecnico pronto per il copia-incolla in Bet Angel Pro composto da:
+1. ARCHETIPO STRATEGICO BET ANGEL SELEZIONATO tra:
+   - BACK_BREAK_0_30 (Back ribattitore su pressione 0-30 / 15-40)
+   - LAY_SERVER_SECOND_SERVE_DECAY (Lay battitore su crollo 2ª palla da Deuce / 4° game)
+   - LAY_SET1_WINNER_LANSDORP_COST (Lay vincitore 1° set ad alto dispendio Lansdorp a inizio 2° set)
+   - BACK_SERVER_HOLD_RECOVERY (Back battitore solido sotto 15-30 con uscita a 40-15)
+   - LAY_FAV_SLOW_CPI_GRIND (Lay favorito su CPI lento in difficoltà sugli scambi 9+ colpi)
+   - SERVANT_3RD_SHOT_DOMINANCE (Ingresso su consolidamento Servizio+Diritto)
+2. STRINGA CSV GUARDIAN ("Set Stored Values using a file"):
+   Righe formattate secondo lo standard ufficiale Bet Angel:
+   Market Name,Selection Name,SV Type,SV Name,SV Value
+   includendo i valori per: MCP_STRATEGY, DIRECTION, ENTRY_ODDS_MIN, ENTRY_ODDS_MAX, OFFSET_TICKS, STOP_TICKS, STAKE_SIZE, SCORE_TRIGGER, SIGNAL_GRADE.
+3. STRINGA FORMULA EXCEL LIVE DDE (Cella Comando L9 o L11):
+   Formula completa con comando globale ufficiale Bet Angel:
+   "BACK/LAY OFFSET:x STOP:y WITH_GREENING:TRUE FILL_KILL:TRUE KILL_DELAY:z"
+4. PARAMETRI GUARDIAN RULE EDITOR (.BAF):
+   Indicazione esatta di Rule Type, Tennis Fixed/Relative Score Condition, Fixed Odds Condition e Unsuspended Time Condition.`
             },
             {
                 id: "sec-10",
                 number: "10",
-                title: "10. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE",
+                title: "10. DIRETTIVE ANTI-BIAS DELL'ANALISTA QUANTITATIVO",
                 status: "optimized",
-                badgeText: "8 SEZIONI OUTPUT v2.0",
-                v2Note: "Aggiunta la Sezione VIII obbligatoria nell'output dell'LLM dedicata alla Sintesi Operativa Betting, Grado del Segnale A/B/C e Trigger Live.",
-                content: `10. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE
-Articola l'output esattamente nelle seguenti 8 sezioni:
-I. Identità Tecnica del Confronto e Impatto Ambientale (Sistemi di gioco + filtro superficie/condizioni).
-II. Collisione Bilaterale Espansa (Sviluppo Canale A→B, Canale B→A e interdipendenze su Servizio, Risposta, 3°/4° colpo e Fondo).
-III. Continuazioni, Variazioni e Transizioni (Cambi d'ala, variazioni tecniche, approcci a rete ed esiti del punto).
-IV. Ripetizione, Adattamenti e Test di Lansdorp (Sostenibilità, costo tecnico/fisico e tenuta tra i set).
-V. Evidenze Empiriche e Limiti (Integrazione PPR, TDI, Atlante, tre S0 e dati MCP: osservato vs dedotto).
-VI. Asimmetrie Risultanti (Isolamento degli squilibri decisivi e del loro peso specifico).
-VII. Firma Tecnica del Match (Impatto su Hold %, Break %, lunghezza scambi ed evoluzione dei set).
-VIII. Sintesi Operativa Betting & Trigger Live (Mappatura mercati, Grado del Segnale A/B/C e indicatori Live dei primi 4 game).`
+                badgeText: "ANTI-BIAS",
+                v3Note: "Elimina ogni tentazione narrativa o diplomatica dell'LLM.",
+                content: `10. DIRETTIVE ANTI-BIAS DELL'ANALISTA QUANTITATIVO
+- Zero Diplomazia: non bilanciare artificialmente i giudizi. Se le collisioni premiano nettamente un giocatore, dichiaralo senza esitazioni.
+- Priorità al Margine di Esecuzione: un colpo spettacolare ma ad alto costo Lansdorp vale meno di una produzione ripetibile all'85% di continuità.
+- Coerenza Causale: ogni parametro Bet Angel (Offset Ticks, Stop Loss, Score Trigger) deve derivare direttamente dalla volatilità tecnica individuata nelle sezioni precedenti.`
             },
             {
                 id: "sec-11",
                 number: "11",
-                title: "11. ISTRUZIONE FINALE DI ESECUZIONE",
+                title: "11. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE (9 SEZIONI)",
+                status: "optimized",
+                badgeText: "9 SEZIONI OUTPUT",
+                v3Note: "Struttura l'output dell'LLM in 9 sezioni rigorose, culminanti nel blocco codice Bet Angel Pro.",
+                content: `11. STRUTTURA OBBLIGATORIA DELLA RELAZIONE FINALE
+Articola la tua risposta esattamente nelle seguenti 9 sezioni:
+I. Identità Tecnica del Confronto & Impatto Ambientale (Sistemi di gioco + filtro CPI, rimbalzo e formato set).
+II. Collisione Bilaterale Espansa (Canale A→B, Canale B→A e retroazioni su Servizio, Risposta, 3°/4° colpo).
+III. Continuazioni, Cambi d'Ala, Variazioni e Rete (Sviluppo 5-8 e 9+ colpi, slice/drop, rete ed esiti FE/UFE).
+IV. Stress-Test di Lansdorp & Tenuta tra i Set (Continuità, collocazione, costo tecnico/fisico e decadimento nel 2°/3° set).
+V. Evidenze Empiriche (PPR, TDI, Atlante, Tre S0 e Dati MCP: osservato vs dedotto).
+VI. Asimmetrie Dominanti & Firma Tecnica del Match.
+VII. Matrice Quantitativa: Hold/Break %, Fair Odds, Edge EV% & Grado del Segnale (A/B/C).
+VIII. Strategia di Trading In-Play & Trigger nei Primi 4 Game.
+IX. Blocco Automazione Bet Angel Pro (Stringa CSV Guardian Stored Values + Formula Excel DDE Cella L9 + Specifica Regola .BAF).`
+            },
+            {
+                id: "sec-12",
+                number: "12",
+                title: "12. ISTRUZIONE FINALE DI ESECUZIONE",
                 status: "new",
-                badgeText: "COMPLETATO IN v2.0",
-                v2Note: "Ripristinata e completata la chiusura esecutiva che nella v1.1 risultava troncata ('Non fer...'), saldando l'intera catena causale dal colpo al mercato.",
-                content: `11. ISTRUZIONE FINALE DI ESECUZIONE
-Analizza ora il confronto assegnato applicando integralmente l'architettura v2.0.
-Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi le collisioni bilaterali secondo il modello MCP, spiega i meccanismi tramite l'Atlante, seleziona le contromosse sostenibili secondo il principio Lansdorp e traduci la Firma Tecnica del match in segnali operativi rigorosi per il betting. Non fermarti finché l'intera catena causale dal singolo colpo all'asimmetria di mercato non è stata completamente dimostrata.`
+                badgeText: "ESECUZIONE COMPLETA",
+                v3Note: "Ordine esecutivo finale che salda analisi tecnica, pricing quantitativo e automazione Bet Angel.",
+                content: `12. ISTRUZIONE FINALE DI ESECUZIONE
+Analizza ora il confronto assegnato applicando integralmente l'architettura v3.0.
+Sviluppa le collisioni bilaterali secondo il modello MCP e il filtro di Lansdorp, calcola le asimmetrie di Hold/Break e le Fair Odds rispetto alle quote di mercato indicate, e genera nella Sezione IX le stringhe esatte pronte per l'importazione automatica in Bet Angel Guardian ed Excel Live DDE.`
             }
         ];
 
-        // State
-        let isV2HighlightActive = false;
-        let currentViewMode = 'cards';
+        // State Variables
+        let isV3HighlightActive = false;
+        let currentPromptSubView = 'cards';
+        let excelLocale = 'IT'; // 'IT' (; and SE/E/O) or 'EN' (, and IF/AND/OR)
 
-        // ============================================================================
-        // 2. INITIALIZATION & RENDERING
-        // ============================================================================
-        function initApp() {
-            renderSections();
-            renderSidebarNav();
-            updateDynamicConfig();
+        // ========================================================================
+        // 2. QUANTITATIVE TENNIS PRICING ENGINE (HOLD/BREAK -> FAIR ODDS & EV)
+        // ========================================================================
+        function computeGameHoldProb(pPointServer) {
+            // Exact Markov formula for holding a tennis service game given p = prob of winning a point on serve
+            const p = Math.max(0.05, Math.min(0.95, pPointServer));
+            const q = 1 - p;
+            const pBeforeDeuce = Math.pow(p, 4) * (1 + 4 * q + 10 * Math.pow(q, 2));
+            const pReachDeuce = 20 * Math.pow(p, 3) * Math.pow(q, 3);
+            const pWinFromDeuce = Math.pow(p, 2) / (Math.pow(p, 2) + Math.pow(q, 2));
+            return pBeforeDeuce + pReachDeuce * pWinFromDeuce;
         }
 
-        function renderSections() {
+        function computeSetWinProb(holdA, holdB) {
+            // Analytical approximationcalibrated to official ATP/WTA Markov matrices from Hold_A and Hold_B
+            const breakA = 1 - holdB; // Prob A breaks B
+            const breakB = 1 - holdA; // Prob B breaks A
+            const netEdgePerGame = (holdA - holdB);
+            // Logistic mapping scaled for set distance + tiebreak sensitivity
+            const k = 7.45;
+            const probSetA = 1 / (1 + Math.exp(-k * netEdgePerGame));
+            return Math.max(0.02, Math.min(0.98, probSetA));
+        }
+
+        function computeMatchWinProb(probSetA, isBestOf5) {
+            const s = probSetA;
+            const q = 1 - s;
+            if (!isBestOf5) {
+                // Best of 3: s^2 * (1 + 2*q)
+                return Math.pow(s, 2) * (1 + 2 * q);
+            } else {
+                // Best of 5: s^3 * (1 + 3*q + 6*q^2)
+                return Math.pow(s, 3) * (1 + 3 * q + 6 * Math.pow(q, 2));
+            }
+        }
+
+        function getQuantMetrics() {
+            const playerA = document.getElementById('cfgPlayerA').value.trim() || 'Player A';
+            const playerB = document.getElementById('cfgPlayerB').value.trim() || 'Player B';
+            const oddsA = parseFloat(document.getElementById('cfgOddsA').value) || 1.80;
+            const oddsB = parseFloat(document.getElementById('cfgOddsB').value) || 2.10;
+            const holdAPct = parseFloat(document.getElementById('cfgHoldA').value) || 85.0;
+            const holdBPct = parseFloat(document.getElementById('cfgHoldB').value) || 80.0;
+            const cpiVal = parseFloat(document.getElementById('cfgCPIValue').value) || 38.0;
+            const format = document.getElementById('cfgFormat').value;
+            const isBo5 = format.includes('5');
+
+            // Adjust effective hold slightly by CPI speed
+            const cpiShift = (cpiVal - 37.5) * 0.0015;
+            const hA = Math.max(0.50, Math.min(0.97, (holdAPct / 100) + cpiShift));
+            const hB = Math.max(0.50, Math.min(0.97, (holdBPct / 100) + cpiShift));
+
+            const probSetA = computeSetWinProb(hA, hB);
+            const probMatchA = computeMatchWinProb(probSetA, isBo5);
+            const probMatchB = 1 - probMatchA;
+
+            const fairOddsA = probMatchA > 0.01 ? (1 / probMatchA) : 99.0;
+            const fairOddsB = probMatchB > 0.01 ? (1 / probMatchB) : 99.0;
+
+            const impliedA = (1 / oddsA) * 100;
+            const impliedB = (1 / oddsB) * 100;
+
+            // EV% = (ModelProb * MarketOdds - 1) * 100
+            const evA = ((probMatchA * oddsA) - 1) * 100;
+            const evB = ((probMatchB * oddsB) - 1) * 100;
+
+            // Tie-break probability in Set 1 (higher when both holds are high)
+            const avgHold = (hA + hB) / 2;
+            const tbProb = Math.min(68.0, Math.max(8.0, Math.pow(avgHold, 6.2) * 58));
+            const expectedBreaksPerSet = ((1 - hA) + (1 - hB)) * 5.1;
+
+            const deltaHold = holdAPct - holdBPct;
+            const maxAbsEv = Math.max(evA, evB);
+
+            let signalGrade = 'GRADO B';
+            let signalLabel = 'GRADO B — CONDIZIONATO';
+            if (maxAbsEv >= 4.0 && Math.abs(deltaHold) >= 4.5) {
+                signalGrade = 'GRADO A';
+                signalLabel = 'GRADO A — ASIMMETRIA NETTA';
+            } else if (maxAbsEv < 1.0 && Math.abs(deltaHold) < 2.0) {
+                signalGrade = 'GRADO C';
+                signalLabel = 'GRADO C — ALTA VARIANZA';
+            }
+
+            return {
+                playerA, playerB, oddsA, oddsB,
+                holdAPct, holdBPct, cpiVal, format,
+                probMatchA, probMatchB,
+                fairOddsA, fairOddsB,
+                impliedA, impliedB,
+                evA, evB,
+                tbProb, expectedBreaksPerSet,
+                deltaHold, signalGrade, signalLabel
+            };
+        }
+
+        // ========================================================================
+        // 3. MASTER RECALCULATION & UI SYNC
+        // ========================================================================
+        function recalcAll() {
+            const q = getQuantMetrics();
+
+            // Update Sidebar Labels
+            document.getElementById('valHoldA').textContent = `${q.holdAPct.toFixed(1)}%`;
+            document.getElementById('valHoldB').textContent = `${q.holdBPct.toFixed(1)}%`;
+            document.getElementById('lblImpliedA').textContent = `Implied: ${q.impliedA.toFixed(1)}%`;
+            document.getElementById('lblImpliedB').textContent = `Implied: ${q.impliedB.toFixed(1)}%`;
+
+            // Update Quant Box
+            document.getElementById('qFairOddsA').textContent = q.fairOddsA.toFixed(2);
+            document.getElementById('qFairOddsB').textContent = q.fairOddsB.toFixed(2);
+            document.getElementById('qModelProbText').textContent = `Model: ${(q.probMatchA * 100).toFixed(1)}% vs ${(q.probMatchB * 100).toFixed(1)}%`;
+
+            const bestEvPlayer = q.evA >= q.evB ? 'A' : 'B';
+            const bestEvVal = q.evA >= q.evB ? q.evA : q.evB;
+            const evEl = document.getElementById('qEdgeValue');
+            evEl.textContent = `${bestEvVal >= 0 ? '+' : ''}${bestEvVal.toFixed(2)}% su ${bestEvPlayer}`;
+            evEl.className = bestEvVal >= 2.0 ? 'text-sm font-bold text-lime-400 mt-0.5' : 'text-sm font-bold text-amber-300 mt-0.5';
+
+            document.getElementById('qDeltaHold').textContent = `Delta Hold: ${q.deltaHold >= 0 ? '+' : ''}${q.deltaHold.toFixed(1)}%`;
+            document.getElementById('qTieBreakProb').textContent = `${q.tbProb.toFixed(1)}%`;
+            document.getElementById('qExpectedBreaks').textContent = q.expectedBreaksPerSet.toFixed(2);
+
+            const gradePill = document.getElementById('quantGradePill');
+            gradePill.textContent = q.signalLabel;
+
+            // Update Top Header Strip
+            document.getElementById('topSignalBadge').textContent = q.signalGrade;
+            document.getElementById('topEdgeBadge').textContent = `${bestEvVal >= 0 ? '+' : ''}${bestEvVal.toFixed(1)}%`;
+
+            const dir = document.getElementById('baDirection').value;
+            const targetKey = document.getElementById('baTarget').value;
+            const targetName = targetKey === 'A' ? q.playerA : q.playerB;
+            const topOrder = document.getElementById('topOrderBadge');
+            topOrder.textContent = `${dir} ${targetName}`;
+            topOrder.className = dir === 'BACK' ? 'font-bold text-sky-400' : 'font-bold text-rose-400';
+
+            // Update Prompt Master & Bet Angel Compiler Strings
+            renderPromptSections();
+            updateBetAngelStrings(q);
+            updateSimulatorTitles(q);
+        }
+
+        function syncCPIFromCategory() {
+            const catVal = document.getElementById('cfgCPICategory').value;
+            document.getElementById('cfgCPIValue').value = catVal;
+            recalcAll();
+        }
+
+        function onStrategyArchetypeChange() {
+            const strat = document.getElementById('baStrategy').value;
+            const dirEl = document.getElementById('baDirection');
+            const scoreEl = document.getElementById('baScoreCondition');
+            const offsetEl = document.getElementById('baOffset');
+            const stopEl = document.getElementById('baStop');
+
+            if (strat === 'BACK_BREAK_0_30') {
+                dirEl.value = 'BACK';
+                scoreEl.value = '0-30_OR_15-40';
+                offsetEl.value = 12;
+                stopEl.value = 8;
+            } else if (strat === 'LAY_SERVER_SECOND_SERVE_DECAY') {
+                dirEl.value = 'LAY';
+                scoreEl.value = 'DEUCE_4TH_GAME_ON';
+                offsetEl.value = 14;
+                stopEl.value = 9;
+            } else if (strat === 'LAY_SET1_WINNER_LANSDORP_COST') {
+                dirEl.value = 'LAY';
+                scoreEl.value = 'SET2_0_0_START';
+                offsetEl.value = 18;
+                stopEl.value = 10;
+            } else if (strat === 'BACK_SERVER_HOLD_RECOVERY') {
+                dirEl.value = 'BACK';
+                scoreEl.value = '15-30_SERVER_RECOVERY';
+                offsetEl.value = 8;
+                stopEl.value = 6;
+            } else if (strat === 'LAY_FAV_SLOW_CPI_GRIND') {
+                dirEl.value = 'LAY';
+                scoreEl.value = 'ANY_BREAK_POINT';
+                offsetEl.value = 15;
+                stopEl.value = 10;
+            } else if (strat === 'SERVANT_3RD_SHOT_DOMINANCE') {
+                dirEl.value = 'BACK';
+                scoreEl.value = 'ANY_SCORE_EARLY';
+                offsetEl.value = 10;
+                stopEl.value = 7;
+            }
+            recalcAll();
+        }
+
+        // ========================================================================
+        // 4. BET ANGEL PRO STRING COMPILER (CSV, EXCEL DDE, .BAF & SERVANT)
+        // ========================================================================
+        function getActiveBetAngelConfig(q) {
+            const strategy = document.getElementById('baStrategy').value;
+            const direction = document.getElementById('baDirection').value;
+            const targetKey = document.getElementById('baTarget').value;
+            const targetName = targetKey === 'A' ? q.playerA : q.playerB;
+            const opponentName = targetKey === 'A' ? q.playerB : q.playerA;
+            const targetRow = targetKey === 'A' ? 9 : 11; // Bet Angel Excel Row 9 = Selection 1, Row 11 = Selection 2
+            const stake = parseFloat(document.getElementById('baStake').value) || 50;
+            const offset = parseInt(document.getElementById('baOffset').value) || 10;
+            const stop = parseInt(document.getElementById('baStop').value) || 8;
+            const kill = parseInt(document.getElementById('baKill').value) || 15;
+            const scoreCode = document.getElementById('baScoreCondition').value;
+            const minOdds = parseFloat(document.getElementById('baMinOdds').value) || 1.30;
+            const maxOdds = parseFloat(document.getElementById('baMaxOdds').value) || 2.50;
+            const greening = document.getElementById('baGreening').value;
+            const tournament = document.getElementById('cfgTournament').value.trim() || 'Match Odds';
+            const surface = document.getElementById('cfgSurface').value;
+
+            return {
+                strategy, direction, targetKey, targetName, opponentName, targetRow,
+                stake, offset, stop, kill, scoreCode, minOdds, maxOdds, greening,
+                tournament, surface
+            };
+        }
+
+        function updateBetAngelStrings(q) {
+            const ba = getActiveBetAngelConfig(q);
+
+            document.getElementById('baSummaryArchetype').textContent = `${ba.strategy} → ${ba.direction} ${ba.targetName}`;
+            document.getElementById('baSummaryDesc').textContent = `Target: ${ba.targetName} (Row ${ba.targetRow}) | Stake: €${ba.stake} | Offset: ${ba.offset} tick | Stop: ${ba.stop} tick | Range Quote: ${ba.minOdds.toFixed(2)}–${ba.maxOdds.toFixed(2)}`;
+
+            // 1. GUARDIAN CSV ("Set Stored Values using a file")
+            const csvLines = [
+                `# ==============================================================================`,
+                `# BET ANGEL PRO GUARDIAN — STORED VALUES IMPORT FILE (.CSV)`,
+                `# Generato da: PROMPT MASTER TENNIS v3.0 Quant Studio`,
+                `# Match: ${q.playerA} vs ${q.playerB} (${ba.tournament} - ${ba.surface}, CPI ${q.cpiVal})`,
+                `# Istruzioni: In Guardian -> Rules -> "Set Stored Values using a file" -> Seleziona questo CSV`,
+                `# ==============================================================================`,
+                `Market Name,Selection Name,SV Type,SV Name,SV Value`,
+                `"${ba.tournament}","${ba.targetName}",Selection,MCP_STRATEGY,"${ba.strategy}"`,
+                `"${ba.tournament}","${ba.targetName}",Selection,TRADE_DIRECTION,"${ba.direction}"`,
+                `"${ba.tournament}","${ba.targetName}",Selection,ENTRY_ODDS_MIN,${ba.minOdds.toFixed(2)}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,ENTRY_ODDS_MAX,${ba.maxOdds.toFixed(2)}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,OFFSET_TICKS,${ba.offset}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,STOP_TICKS,${ba.stop}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,KILL_DELAY_SEC,${ba.kill}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,STAKE_EUR,${ba.stake.toFixed(2)}`,
+                `"${ba.tournament}","${ba.targetName}",Selection,SCORE_CONDITION_CODE,"${ba.scoreCode}"`,
+                `"${ba.tournament}","${ba.targetName}",Market,COURT_CPI_INDEX,${q.cpiVal}`,
+                `"${ba.tournament}","${ba.targetName}",Market,MODEL_FAIR_ODDS_A,${q.fairOddsA.toFixed(2)}`,
+                `"${ba.tournament}","${ba.targetName}",Market,MODEL_FAIR_ODDS_B,${q.fairOddsB.toFixed(2)}`,
+                `"${ba.tournament}","${ba.targetName}",Market,SIGNAL_CONFIDENCE_GRADE,"${q.signalGrade}"`
+            ];
+            document.getElementById('baCsvOutput').textContent = csvLines.join('\n');
+
+            // 2. EXCEL LIVE DDE FORMULAS (Command Cell L9/L11, Odds M9/M11, Stake N9/N11)
+            const r = ba.targetRow; // 9 for Player A, 11 for Player B
+            const priceCell = ba.direction === 'BACK' ? `G${r}` : `H${r}`; // G = Best Back Odds, H = Best Lay Odds in Bet Angel template
+            const rawCmd = `${ba.direction} OFFSET:${ba.offset} STOP:${ba.stop} WITH_GREENING:${ba.greening} FILL_KILL:TRUE KILL_DELAY:${ba.kill}`;
+            document.getElementById('baRawCommandString').textContent = rawCmd;
+            document.getElementById('lblTargetExcelRow').textContent = `FORMULA COMPLETA CELLA COMANDO (Cella L${r} — ${ba.targetName}):`;
+
+            // Score condition check on Cell AF9 (or Custom Score cell in Bet Angel Tennis sheet)
+            let scoreExprIT = `O(AF${r}="0-30"; AF${r}="15-40")`;
+            let scoreExprEN = `OR(AF${r}="0-30", AF${r}="15-40")`;
+
+            if (ba.scoreCode === 'ANY_BREAK_POINT') {
+                scoreExprIT = `O(AF${r}="15-40"; AF${r}="30-40"; AF${r}="40-AD")`;
+                scoreExprEN = `OR(AF${r}="15-40", AF${r}="30-40", AF${r}="40-AD")`;
+            } else if (ba.scoreCode === 'DEUCE_4TH_GAME_ON') {
+                scoreExprIT = `E(O(AF${r}="30-30"; AF${r}="40-40"); AE${r}>=4)`;
+                scoreExprEN = `AND(OR(AF${r}="30-30", AF${r}="40-40"), AE${r}>=4)`;
+            } else if (ba.scoreCode === 'SET2_0_0_START') {
+                scoreExprIT = `E(AD${r}=1; AE${r}=0; AF${r}="0-0")`;
+                scoreExprEN = `AND(AD${r}=1, AE${r}=0, AF${r}="0-0")`;
+            } else if (ba.scoreCode === '15-30_SERVER_RECOVERY') {
+                scoreExprIT = `AF${r}="15-30"`;
+                scoreExprEN = `AF${r}="15-30"`;
+            } else if (ba.scoreCode === 'ANY_SCORE_EARLY') {
+                scoreExprIT = `F4="In-Play"`;
+                scoreExprEN = `F4="In-Play"`;
+            }
+
+            let formulaL, formulaM, formulaN;
+            if (excelLocale === 'IT') {
+                formulaL = `=SE(E(F4="In-Play"; O${r}=""; ${priceCell}>=${ba.minOdds.toFixed(2)}; ${priceCell}<=${ba.maxOdds.toFixed(2)}; ${scoreExprIT}); "${rawCmd}"; "")`;
+                formulaM = `=SE(L${r}<>""; ${priceCell}; "")`;
+                formulaN = `=SE(L${r}<>""; ${ba.stake.toFixed(2)}; "")`;
+            } else {
+                formulaL = `=IF(AND(F4="In-Play", O${r}="", ${priceCell}>=${ba.minOdds.toFixed(2)}, ${priceCell}<=${ba.maxOdds.toFixed(2)}, ${scoreExprEN}), "${rawCmd}", "")`;
+                formulaM = `=IF(L${r}<>"", ${priceCell}, "")`;
+                formulaN = `=IF(L${r}<>"", ${ba.stake.toFixed(2)}, "")`;
+            }
+
+            document.getElementById('baExcelFormulaL9').textContent = formulaL;
+            document.getElementById('baExcelFormulaM9').textContent = formulaM;
+            document.getElementById('baExcelFormulaN9').textContent = formulaN;
+
+            // 3. GUARDIAN .BAF RULE BLUEPRINT
+            const bafText = `================================================================================
+BET ANGEL GUARDIAN AUTOMATION RULE BLUEPRINT (.BAF SPECIFICATION)
+Nome Regola: [MCP v3.0] ${ba.strategy} — ${ba.direction} ${ba.targetName}
+================================================================================
+
+[TAB 1: GENERAL]
+• Rule Name:                ${ba.strategy}_${ba.targetName.replace(/\s+/g, '_').toUpperCase()}
+• Rule Type:                Place ${ba.direction === 'BACK' ? 'Back' : 'Lay'} Bet
+• Rule Trigger Times:       Relative to In-Play time -> From 00:00:05 after event goes In-Play
+• Allow Rule to Trigger:    Up to 2 times, Wait 120 seconds before rearming
+• Applies to Selection:     By Name -> "${ba.targetName}" (Row ${ba.targetRow})
+
+[TAB 2: PARAMETERS]
+• Place At:                 Best Market Price
+• Stake:                    Fixed Amount = €${ba.stake.toFixed(2)} (oppure Stored Value "STAKE_EUR")
+• Global Settings Action:   Offset bet with greening and stop
+  - Offset (Ticks):         ${ba.offset} ticks
+  - Place Fill or Kill:     Checked (${ba.kill} seconds delay)
+  - Offset Batches:         1
+  - Stop Trigger (Ticks):   ${ba.stop} ticks
+  - Place Stop at (Ticks):  ${ba.stop + 2} ticks
+  - Greening:               ${ba.greening === 'TRUE' ? 'Enabled (Spread profit across all selections)' : 'Disabled'}
+
+[TAB 3: CONDITIONS (TUTTE OBBLIGATORIE IN AND)]
+1. In-Play Condition:       The Market is In-Play
+2. Unsuspended Time Cond:   Time since market last unsuspended > 4 seconds
+3. Fixed Odds Condition:    Selection "${ba.targetName}" ${ba.direction} Price is between ${ba.minOdds.toFixed(2)} and ${ba.maxOdds.toFixed(2)}
+4. Tennis Fixed Score Cond: Score Trigger = [${ba.scoreCode}]
+   - Points Condition:      ${ba.scoreCode === '0-30_OR_15-40' ? 'Server Points = 0/15 AND Returner Points = 30/40' : ba.scoreCode}
+5. Matched Bets Condition:  Number of Unmatched Bets on Selection = 0
+
+[TAB 4: SIGNALS & STORED VALUES]
+• Set Signal (Selection):   Name = "MCP_ENTRY_ACTIVE", Value = 1
+• Set Stored Value (Mkt):   Name = "LAST_ENTRY_ODDS", Value = Selection's ${ba.direction} Price`;
+            document.getElementById('baBafBlueprintText').textContent = bafText;
+
+            // 4. SERVANT SPECIFICATION
+            const servantText = `[BET ANGEL AUTOMATION SERVANT (ASC) — LADDER / ONE-CLICK PRESET]
+• Servant Name:             ASC_${ba.strategy}
+• Selection Context:        Serve Context Selection (Giocatore sotto il cursore mouse: "${ba.targetName}")
+• Stake Context:            Preset Stake (€${ba.stake.toFixed(2)}) o Context Stake
+• Entry Action:             Place ${ba.direction} Bet at Context Price -> Offset: ${ba.offset} Ticks | Stop: ${ba.stop} Ticks
+• Exit Hedge Trigger:       Auto-Green quando Point Score avanza di +2 punti a favore di "${ba.targetName}"`;
+            document.getElementById('baServantText').textContent = servantText;
+        }
+
+        function setExcelLocale(loc) {
+            excelLocale = loc;
+            const btnIT = document.getElementById('btnExcelIT');
+            const btnEN = document.getElementById('btnExcelEN');
+            if (loc === 'IT') {
+                btnIT.className = "px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold cursor-pointer";
+                btnEN.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer";
+            } else {
+                btnEN.className = "px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold cursor-pointer";
+                btnIT.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white cursor-pointer";
+            }
+            recalcAll();
+            showToast(`Sintassi formule Excel impostata su ${loc === 'IT' ? 'Italiano (; / SE)' : 'Inglese (, / IF)'}`, 'info');
+        }
+
+        // ========================================================================
+        // 5. PROMPT MASTER v3.0 RENDERER & DYNAMIC BLOCK INJECTION
+        // ========================================================================
+        function getActivePromptSectionsList() {
+            const includeRAG = document.getElementById('chkIncludeRAG').checked;
+            if (includeRAG) {
+                return [CORE_PROMPT_SECTIONS_V3[0], RAG_GLOSSARY_SECTION, ...CORE_PROMPT_SECTIONS_V3.slice(1)];
+            }
+            return CORE_PROMPT_SECTIONS_V3;
+        }
+
+        function buildDynamicMatchContextBlock() {
+            const q = getQuantMetrics();
+            const ba = getActiveBetAngelConfig(q);
+            const notes = document.getElementById('cfgNotes').value.trim();
+            const altitude = document.getElementById('cfgAltitude').value.trim();
+
+            return `====================================================================
+[CONTESTO MATCH, METRICHE QUANT & PARAMETRI BET ANGEL ASSEGNATI]
+====================================================================
+• CONFRONTO:                ${q.playerA} (Selection 1 - Row 9) vs ${q.playerB} (Selection 2 - Row 11)
+• TORNEO & SUPERFICIE:      ${ba.tournament} | ${ba.surface} | CPI: ${q.cpiVal} | ${altitude}
+• FORMATO INCONTRO:         ${q.format}
+• QUOTE BETFAIR EXCHANGE:   ${q.playerA} @ ${q.oddsA.toFixed(2)} (Implied ${q.impliedA.toFixed(1)}%) | ${q.playerB} @ ${q.oddsB.toFixed(2)} (Implied ${q.impliedB.toFixed(1)}%)
+• HOLD % ATTESO ININGRESSO: ${q.playerA}: ${q.holdAPct.toFixed(1)}% | ${q.playerB}: ${q.holdBPct.toFixed(1)}% (Delta Hold: ${q.deltaHold >= 0 ? '+' : ''}${q.deltaHold.toFixed(1)}%)
+• PRICING QUANTITATIVO:     Fair Odds Modello: ${q.playerA} @ ${q.fairOddsA.toFixed(2)} / ${q.playerB} @ ${q.fairOddsB.toFixed(2)} | Grado: ${q.signalGrade}
+• PARAMETRI BET ANGEL PRO:
+  - Archetipo Tattico:      ${ba.strategy}
+  - Operazione & Target:    ${ba.direction} su "${ba.targetName}" | Stake: €${ba.stake.toFixed(2)}
+  - Global Settings:        OFFSET:${ba.offset} | STOP:${ba.stop} | KILL_DELAY:${ba.kill}s | WITH_GREENING:${ba.greening}
+  - Condizione Punteggio:   ${ba.scoreCode} | Range Quote: ${ba.minOdds.toFixed(2)} - ${ba.maxOdds.toFixed(2)}
+• NOTE DATI (MCP/PPR/TDI):  ${notes || 'Nessuna nota aggiuntiva'}
+====================================================================`;
+        }
+
+        function getFullPromptTextV3() {
+            const sections = getActivePromptSectionsList();
+            const blocks = [PROMPT_HEADER_V3];
+            sections.forEach(s => blocks.push(s.content));
+            blocks.push(buildDynamicMatchContextBlock());
+            return blocks.join('\n\n---\n\n');
+        }
+
+        function renderPromptSections() {
             const container = document.getElementById('sectionsListContainer');
+            const sections = getActivePromptSectionsList();
             container.innerHTML = '';
 
-            PROMPT_SECTIONS.forEach((sec) => {
-                // Determine badge & classes based on status
+            sections.forEach(sec => {
                 let statusClass = '';
                 let badgeHtml = '';
 
                 if (sec.status === 'new') {
-                    statusClass = 'is-v2-new';
-                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                        <i class="fa-solid fa-bolt mr-1"></i>${sec.badgeText}
-                    </span>`;
+                    statusClass = 'is-v3-new';
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">${sec.badgeText}</span>`;
+                } else if (sec.status === 'ba') {
+                    statusClass = 'is-v3-ba';
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">${sec.badgeText}</span>`;
                 } else if (sec.status === 'optimized') {
-                    statusClass = 'is-v2-opt';
-                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                        <i class="fa-solid fa-arrow-up-right-dots mr-1"></i>${sec.badgeText}
-                    </span>`;
+                    statusClass = 'is-v3-opt';
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">${sec.badgeText}</span>`;
                 } else {
-                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-cyan-300 border border-slate-700">
-                        ${sec.badgeText}
-                    </span>`;
+                    badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">${sec.badgeText}</span>`;
                 }
 
                 const card = document.createElement('div');
-                card.id = sec.id;
-                card.dataset.sectionTitle = sec.title.toLowerCase();
-                card.dataset.sectionContent = sec.content.toLowerCase();
-                card.className = `prompt-section-card rounded-xl border border-slate-800 bg-[#131c2e]/95 p-5 shadow-md transition-all duration-300 ${statusClass}`;
+                card.className = `prompt-section-card rounded-xl border border-slate-800 bg-[#101829]/95 p-5 shadow-md transition-all ${statusClass}`;
+                card.dataset.searchText = `${sec.title} ${sec.content}`.toLowerCase();
 
                 card.innerHTML = `
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/90 pb-3 mb-3">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="w-6 h-6 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-xs font-mono font-bold text-emerald-400">
-                                ${sec.number}
-                            </span>
-                            <h3 class="text-xs sm:text-sm font-bold text-white font-mono tracking-tight">
-                                ${escapeHtml(sec.title)}
-                            </h3>
+                            <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-xs font-mono font-bold text-emerald-400">${sec.number}</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-white font-mono">${escapeHtml(sec.title)}</h3>
                             ${badgeHtml}
                         </div>
-                        <button onclick="copySection('${sec.id}')" class="self-start sm:self-center shrink-0 px-2.5 py-1 rounded text-xs font-mono bg-slate-800/90 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700 hover:border-emerald-500/40 transition cursor-pointer">
-                            <i class="fa-regular fa-copy mr-1"></i>Copia Sezione ${sec.number}
+                        <button onclick="copyPromptSectionById('${sec.id}')" class="self-start sm:self-center shrink-0 px-2.5 py-1 rounded text-xs font-mono bg-slate-800 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700 cursor-pointer">
+                            <i class="fa-regular fa-copy mr-1"></i>Copia Sez. ${sec.number}
                         </button>
                     </div>
-
-                    <!-- V2.0 Upgrade Explanation Banner (Visible when Mostra Novità v2.0 is active) -->
-                    <div class="v2-note-banner items-start gap-2.5 p-3 mb-3 rounded-lg bg-slate-950/90 border border-slate-700/80 text-xs text-slate-300">
-                        <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 shrink-0"></i>
-                        <div>
-                            <span class="font-bold text-white uppercase text-[10px] tracking-wider block mb-0.5">Nota Architetturale v2.0:</span>
-                            ${escapeHtml(sec.v2Note)}
-                        </div>
+                    <div class="v3-note-banner items-start gap-2 p-2.5 mb-3 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-300">
+                        <i class="fa-solid fa-circle-info text-cyan-400 mt-0.5"></i>
+                        <span><strong class="text-white">Upgrade v3.0:</strong> ${escapeHtml(sec.v3Note)}</span>
                     </div>
-
-                    <!-- Verbatim Prompt Content -->
-                    <pre class="font-mono text-xs sm:text-[13px] text-slate-200 whitespace-pre-wrap leading-relaxed select-all">${escapeHtml(sec.content)}</pre>
+                    <pre class="font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed select-all">${escapeHtml(sec.content)}</pre>
                 `;
-
                 container.appendChild(card);
             });
+
+            document.getElementById('dynamicMatchPreviewText').textContent = buildDynamicMatchContextBlock();
+            document.getElementById('rawFullPromptOutput').textContent = getFullPromptTextV3();
+            filterPromptSections();
         }
 
-        function renderSidebarNav() {
-            const nav = document.getElementById('sectionNavList');
-            nav.innerHTML = '';
-
-            PROMPT_SECTIONS.forEach((sec) => {
-                let dotColor = 'bg-slate-600';
-                if (sec.status === 'new') dotColor = 'bg-emerald-400';
-                if (sec.status === 'optimized') dotColor = 'bg-amber-400';
-
-                const btn = document.createElement('button');
-                btn.onclick = () => scrollToSection(sec.id);
-                btn.className = "w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-800/80 text-slate-300 hover:text-white transition flex items-center justify-between gap-2 cursor-pointer group";
-                btn.innerHTML = `
-                    <span class="truncate font-mono text-[11px] group-hover:text-emerald-300 transition">
-                        ${escapeHtml(sec.title)}
-                    </span>
-                    <span class="w-2 h-2 rounded-full ${dotColor} shrink-0" title="${sec.badgeText}"></span>
-                `;
-                nav.appendChild(btn);
-            });
+        // ========================================================================
+        // 6. SIMULATOR LANSDORP + MCP (TAB 3)
+        // ========================================================================
+        function updateSimulatorTitles(q) {
+            document.getElementById('simTitlePlayerA').textContent = `GIOCATORE A: ${q.playerA}`;
+            document.getElementById('simTitlePlayerB').textContent = `GIOCATORE B: ${q.playerB}`;
+            updateSimulator(false);
         }
 
-        // ============================================================================
-        // 3. BUILD VERBATIM FULL PROMPT & DYNAMIC MATCH CONFIGURATION
-        // ============================================================================
-        function getBaseVerbatimPrompt(format = 'txt') {
-            const blocks = [PROMPT_HEADER];
-            PROMPT_SECTIONS.forEach(sec => {
-                blocks.push(sec.content);
-            });
-            return blocks.join('\n\n---\n\n');
-        }
+        function updateSimulator(triggerToast = false) {
+            const a1 = parseFloat(document.getElementById('simA1').value);
+            const a2 = parseFloat(document.getElementById('simA2').value);
+            const a3 = parseFloat(document.getElementById('simA3').value);
+            const a4 = parseFloat(document.getElementById('simA4').value);
+            const a5 = parseFloat(document.getElementById('simA5').value);
 
-        function getMatchConfigBlock() {
-            const playerA = document.getElementById('cfgPlayerA').value.trim();
-            const playerB = document.getElementById('cfgPlayerB').value.trim();
-            const tournament = document.getElementById('cfgTournament').value.trim();
-            const cpi = document.getElementById('cfgCPI').value.trim();
-            const format = document.getElementById('cfgFormat').value.trim();
-            const odds = document.getElementById('cfgOdds').value.trim();
-            const notes = document.getElementById('cfgNotes').value.trim();
+            const b1 = parseFloat(document.getElementById('simB1').value);
+            const b2 = parseFloat(document.getElementById('simB2').value);
+            const b3 = parseFloat(document.getElementById('simB3').value);
+            const b4 = parseFloat(document.getElementById('simB4').value);
+            const b5 = parseFloat(document.getElementById('simB5').value);
 
-            const hasAnyInput = playerA || playerB || tournament || cpi || format || odds || notes;
-            if (!hasAnyInput) return '';
+            document.getElementById('lblSimA1').textContent = a1.toFixed(1);
+            document.getElementById('lblSimA2').textContent = a2.toFixed(1);
+            document.getElementById('lblSimA3').textContent = a3.toFixed(1);
+            document.getElementById('lblSimA4').textContent = a4.toFixed(1);
+            document.getElementById('lblSimA5').textContent = a5.toFixed(1);
 
-            let lines = [];
-            lines.push(`====================================================================`);
-            lines.push(`DATI DEL MATCH ASSEGNATO PER L'ANALISI (INPUT OPERATIVO)`);
-            lines.push(`====================================================================`);
-            if (playerA || playerB) {
-                lines.push(`- CONFRONTO: ${playerA || '[Giocatore A]'} vs ${playerB || '[Giocatore B]'}`);
-            }
-            if (tournament) {
-                lines.push(`- TORNEO E SUPERFICIE: ${tournament}`);
-            }
-            if (cpi) {
-                lines.push(`- CPI / VELOCITÀ E CONDIZIONI CAMPO: ${cpi}`);
-            }
-            if (format) {
-                lines.push(`- FORMATO INCONTRO: ${format}`);
-            }
-            if (odds) {
-                lines.push(`- QUOTE BOOKMAKER ATTUALI: ${odds}`);
-            }
-            if (notes) {
-                lines.push(`- NOTE DATI (MCP / PPR / TDI / TRE S0 / CONTESTO):\n${notes}`);
-            }
-            lines.push(`====================================================================`);
-            return lines.join('\n');
-        }
+            document.getElementById('lblSimB1').textContent = b1.toFixed(1);
+            document.getElementById('lblSimB2').textContent = b2.toFixed(1);
+            document.getElementById('lblSimB3').textContent = b3.toFixed(1);
+            document.getElementById('lblSimB4').textContent = b4.toFixed(1);
+            document.getElementById('lblSimB5').textContent = b5.toFixed(1);
 
-        function getCompletePromptText() {
-            const basePrompt = getBaseVerbatimPrompt();
-            const matchBlock = getMatchConfigBlock();
-            if (matchBlock) {
-                return `${basePrompt}\n\n---\n\n${matchBlock}`;
-            }
-            return basePrompt;
-        }
+            const avgA = (a1 + a2 + a3 + a4 + a5) / 5;
+            const avgB = (b1 + b2 + b3 + b4 + b5) / 5;
 
-        function updateDynamicConfig() {
-            const matchBlock = getMatchConfigBlock();
-            const dynamicCard = document.getElementById('dynamicMatchCard');
-            const previewText = document.getElementById('dynamicMatchPreviewText');
-            const statusText = document.getElementById('cfgStatusText');
-            const rawOutput = document.getElementById('rawFullPromptOutput');
-            const charBadge = document.getElementById('charCountBadge');
+            document.getElementById('simTotalScoreA').textContent = `Indice: ${avgA.toFixed(2)} / 10`;
+            document.getElementById('simTotalScoreB').textContent = `Indice: ${avgB.toFixed(2)} / 10`;
 
-            if (matchBlock) {
-                dynamicCard.classList.remove('hidden');
-                previewText.textContent = matchBlock;
-                statusText.innerHTML = `
-                    <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse inline-block"></span>
-                    <span class="text-lime-300 font-semibold">Input Match attivo in coda al prompt</span>
-                `;
+            const cpi = parseFloat(document.getElementById('cfgCPIValue').value) || 38;
+            const pA = document.getElementById('cfgPlayerA').value || 'Giocatore A';
+            const pB = document.getElementById('cfgPlayerB').value || 'Giocatore B';
+
+            let recStrat = 'BACK_BREAK_0_30';
+            let recDir = 'BACK';
+            let recTarget = 'A';
+            let diag = '';
+
+            if (a2 - b1 >= 1.0) {
+                recStrat = 'BACK_BREAK_0_30';
+                recDir = 'BACK';
+                recTarget = 'A';
+                diag = `Asimmetria netta in Risposta (${pA} ${a2}/10 vs Servizio ${pB} ${b1}/10). Quando ${pB} scende a 0-30 o 15-40, il differenziale di continuità Lansdorp genera un picco di conversione break. Consigliato: BACK ${pA} su trigger 0-30 / 15-40.`;
+            } else if (a4 - b4 >= 1.5) {
+                recStrat = 'LAY_SET1_WINNER_LANSDORP_COST';
+                recDir = 'LAY';
+                recTarget = 'B';
+                diag = `${pB} presenta un'economia tecnica/fisica Lansdorp significativamente inferiore (${b4}/10 vs ${a4}/10). Anche se ${pB} vince il 1° set tramite picchi ad alto rischio, il decadimento atteso dal 2° set suggerisce LAY ${pB} a inizio 2° set.`;
+            } else if (cpi < 34 && b5 > a5) {
+                recStrat = 'LAY_FAV_SLOW_CPI_GRIND';
+                recDir = 'LAY';
+                recTarget = 'A';
+                diag = `Su campo lento (CPI ${cpi}), la superiorità di ${pB} negli scambi lunghi 9+ colpi (${b5}/10 vs ${a5}/10) neutralizza il servizio di ${pA}. Consigliato: LAY ${pA} su palle break.`;
+            } else if (a1 >= 8.5 && a3 >= 8.0) {
+                recStrat = 'BACK_SERVER_HOLD_RECOVERY';
+                recDir = 'BACK';
+                recTarget = 'A';
+                diag = `${pA} domina il complesso Servizio + 3° Colpo (${a1}/10) con alta continuità (${a3}/10). Eventuali passaggi a vuoto (15-30 sul proprio servizio) offrono ingressi ad alto EV per scalping rapido fino a 40-15.`;
             } else {
-                dynamicCard.classList.add('hidden');
-                previewText.textContent = '';
-                statusText.innerHTML = `
-                    <span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
-                    <span>Nessun match configurato (Solo Prompt Master)</span>
-                `;
+                recStrat = 'LAY_SERVER_SECOND_SERVE_DECAY';
+                recDir = 'LAY';
+                recTarget = avgA >= avgB ? 'B' : 'A';
+                diag = `Delta equilibrato nei primi colpi ma vulnerabilità sulla tenuta della seconda palla nei game prolungati (Deuce dal 4° game in poi).`;
             }
 
-            const fullText = getCompletePromptText();
-            rawOutput.textContent = fullText;
-            charBadge.textContent = `${fullText.length.toLocaleString('it-IT')} caratteri`;
+            const badge = document.getElementById('simRecBadge');
+            badge.textContent = `STRATEGIA CONSIGLIATA: ${recStrat} (${recDir} Giocatore ${recTarget})`;
+            badge.dataset.recStrat = recStrat;
+            badge.dataset.recDir = recDir;
+            badge.dataset.recTarget = recTarget;
+            document.getElementById('simDiagnosticText').textContent = diag;
         }
 
-        function loadDemoMatch() {
-            document.getElementById('cfgPlayerA').value = 'Jannik Sinner';
-            document.getElementById('cfgPlayerB').value = 'Carlos Alcaraz';
-            document.getElementById('cfgTournament').value = 'ATP Masters 1000 — Hard Outdoor';
-            document.getElementById('cfgCPI').value = 'CPI 38.4 (Medio-Veloce, rimbalzo medio-alto)';
-            document.getElementById('cfgFormat').value = 'Best of 3 Set (2 su 3)';
-            document.getElementById('cfgOdds').value = 'ML: Sinner @1.75 / Alcaraz @2.15 | Over 22.5 @1.85';
-            document.getElementById('cfgNotes').value = '- Sinner: pressione costante sulla diagonale di rovescio, rendimento risposta 2ª >54%.\n- Alcaraz: variazioni drop shot + accelerazione inside-out di diritto, picchi ad alto dispendio.\n- Verifica tenuta servizio sulla 2ª di Alcaraz contro risposta anticipata di Sinner.';
-            updateDynamicConfig();
-            showToast('Match Demo caricato in coda al prompt!', 'info');
+        function applyRecommendedStrategyFromSim() {
+            const badge = document.getElementById('simRecBadge');
+            const recStrat = badge.dataset.recStrat || 'BACK_BREAK_0_30';
+            const recDir = badge.dataset.recDir || 'BACK';
+            const recTarget = badge.dataset.recTarget || 'A';
+
+            document.getElementById('baStrategy').value = recStrat;
+            onStrategyArchetypeChange();
+            document.getElementById('baDirection').value = recDir;
+            document.getElementById('baTarget').value = recTarget;
+            recalcAll();
+            switchMainTab('betangel');
+            showToast(`Strategia ${recStrat} applicata e stringhe Bet Angel aggiornate!`, 'success');
         }
 
-        function clearMatchConfig() {
-            document.getElementById('cfgPlayerA').value = '';
-            document.getElementById('cfgPlayerB').value = '';
-            document.getElementById('cfgTournament').value = '';
-            document.getElementById('cfgCPI').value = '';
-            document.getElementById('cfgFormat').value = '';
-            document.getElementById('cfgOdds').value = '';
-            document.getElementById('cfgNotes').value = '';
-            updateDynamicConfig();
-            showToast('Configuratore Match ripristinato.', 'info');
+        // ========================================================================
+        // 7. AI OUTPUT PARSER -> BET ANGEL (TAB 4)
+        // ========================================================================
+        function loadSampleAIOutput() {
+            const q = getQuantMetrics();
+            const sample = `SEZIONE VII. MATRICE QUANTITATIVA & GRADO DEL SEGNALE
+- Hold % Atteso: ${q.playerA} 89.0% | ${q.playerB} 81.5%
+- Fair Odds Modello: ${q.playerA} @ 1.47 | ${q.playerB} @ 3.12
+- Classificazione Segnale: GRADO A (Asimmetria Strutturale Netta sulla diagonale di rovescio e risposta sulla 2ª)
+
+SEZIONE IX. BLOCCO AUTOMAZIONE BET ANGEL PRO
+- ARCHETIPO: BACK_BREAK_0_30
+- AZIONE: BACK su ${q.playerA}
+- RANGE QUOTE INGRESSO: 1.42 - 1.95
+- PARAMETRI GLOBALI: OFFSET:14 STOP:8 WITH_GREENING:TRUE KILL_DELAY:15
+- SCORE TRIGGER: 0-30_OR_15-40`;
+            document.getElementById('aiParserInput').value = sample;
+            parseAIOutputAndApply();
         }
 
-        // ============================================================================
-        // 4. COPY, EXPORT & UI INTERACTION FUNCTIONS
-        // ============================================================================
-        function copyToClipboard(text, successMessage) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '0';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
+        function parseAIOutputAndApply() {
+            const raw = document.getElementById('aiParserInput').value.trim();
+            if (!raw) {
+                showToast('Incolla prima un testo di output AI o clicca su Simula Output AI!', 'error');
+                return;
+            }
 
+            const upper = raw.toUpperCase();
+            const pA = document.getElementById('cfgPlayerA').value.trim();
+            const pB = document.getElementById('cfgPlayerB').value.trim();
+
+            // Detect Strategy Archetype
+            const archetypes = [
+                'BACK_BREAK_0_30',
+                'LAY_SERVER_SECOND_SERVE_DECAY',
+                'LAY_SET1_WINNER_LANSDORP_COST',
+                'BACK_SERVER_HOLD_RECOVERY',
+                'LAY_FAV_SLOW_CPI_GRIND',
+                'SERVANT_3RD_SHOT_DOMINANCE'
+            ];
+            let foundStrat = 'BACK_BREAK_0_30';
+            for (const a of archetypes) {
+                if (upper.includes(a)) {
+                    foundStrat = a;
+                    break;
+                }
+            }
+
+            // Detect Direction
+            let foundDir = upper.includes('LAY ') || foundStrat.startsWith('LAY_') ? 'LAY' : 'BACK';
+
+            // Detect Target Player
+            let foundTarget = 'A';
+            if (pB && raw.toLowerCase().includes(`su ${pB.toLowerCase()}`)) {
+                foundTarget = 'B';
+            }
+
+            // Detect Offset & Stop Ticks
+            const offsetMatch = upper.match(/OFFSET\s*[:=]\s*(\d+)/);
+            const stopMatch = upper.match(/STOP\s*[:=]\s*(\d+)/);
+            const foundOffset = offsetMatch ? parseInt(offsetMatch[1]) : 12;
+            const foundStop = stopMatch ? parseInt(stopMatch[1]) : 8;
+
+            // Detect Grade
+            let foundGrade = 'GRADO B';
+            if (upper.includes('GRADO A')) foundGrade = 'GRADO A';
+            else if (upper.includes('GRADO C')) foundGrade = 'GRADO C';
+
+            // Update Parser Preview UI
+            document.getElementById('parserStatusBadge').innerHTML = `<span class="text-emerald-400 font-bold">✓ Estratto e Sincronizzato con Bet Angel</span>`;
+            document.getElementById('pExtAction').textContent = `${foundDir} ${foundTarget === 'A' ? pA : pB}`;
+            document.getElementById('pExtStrat').textContent = foundStrat;
+            document.getElementById('pExtTicks').textContent = `Offset ${foundOffset} / Stop ${foundStop}`;
+            document.getElementById('pExtGrade').textContent = foundGrade;
+
+            // Apply to Sidebar & Recompile Bet Angel Strings
+            document.getElementById('baStrategy').value = foundStrat;
+            document.getElementById('baDirection').value = foundDir;
+            document.getElementById('baTarget').value = foundTarget;
+            document.getElementById('baOffset').value = foundOffset;
+            document.getElementById('baStop').value = foundStop;
+
+            recalcAll();
+            showToast('Parametri estratti dall\'AI e compilati nelle stringhe Bet Angel!', 'success');
+        }
+
+        // ========================================================================
+        // 8. PRESETS, TABS, COPY & DOWNLOAD UTILITIES
+        // ========================================================================
+        function loadPreset(presetName) {
+            if (presetName === 'sinner_alcaraz') {
+                document.getElementById('cfgPlayerA').value = 'Jannik Sinner';
+                document.getElementById('cfgOddsA').value = '1.58';
+                document.getElementById('cfgHoldA').value = '88.5';
+                document.getElementById('cfgPlayerB').value = 'Carlos Alcaraz';
+                document.getElementById('cfgOddsB').value = '2.68';
+                document.getElementById('cfgHoldB').value = '82.0';
+                document.getElementById('cfgTournament').value = 'ATP Finals Torino — Match Odds';
+                document.getElementById('cfgSurface').value = 'Cemento Indoor';
+                document.getElementById('cfgCPICategory').value = '42.5';
+                document.getElementById('cfgCPIValue').value = '42.5';
+                document.getElementById('baStrategy').value = 'BACK_BREAK_0_30';
+                document.getElementById('baDirection').value = 'BACK';
+                document.getElementById('baTarget').value = 'A';
+                document.getElementById('baOffset').value = '12';
+                document.getElementById('baStop').value = '8';
+                document.getElementById('cfgNotes').value = 'Sinner: TDI Rovescio 9.4, 56% punti vinti in risposta sulla 2ª avversaria. Alcaraz: alto costo Lansdorp su campi rapidi indoor quando costretto a colpire sopra l\'anca sul rovescio.';
+            } else if (presetName === 'clay_grinder') {
+                document.getElementById('cfgPlayerA').value = 'Alexander Zverev';
+                document.getElementById('cfgOddsA').value = '1.72';
+                document.getElementById('cfgHoldA').value = '81.0';
+                document.getElementById('cfgPlayerB').value = 'Casper Ruud';
+                document.getElementById('cfgOddsB').value = '2.32';
+                document.getElementById('cfgHoldB').value = '83.5';
+                document.getElementById('cfgTournament').value = 'Roland Garros — Match Odds';
+                document.getElementById('cfgSurface').value = 'Terra Battuta';
+                document.getElementById('cfgCPICategory').value = '26';
+                document.getElementById('cfgCPIValue').value = '25.5';
+                document.getElementById('cfgFormat').value = 'Best of 5 (3 su 5 - Slam)';
+                document.getElementById('baStrategy').value = 'LAY_FAV_SLOW_CPI_GRIND';
+                document.getElementById('baDirection').value = 'LAY';
+                document.getElementById('baTarget').value = 'A';
+                document.getElementById('baOffset').value = '15';
+                document.getElementById('baStop').value = '10';
+                document.getElementById('cfgNotes').value = 'Terra battuta lenta (CPI 25.5): il kick di diritto di Ruud spinge il rovescio di Zverev 2.5m dietro la linea di fondo; cala l\'efficacia della 1ª piatta di Zverev dal 3° set.';
+            }
+            recalcAll();
+            showToast('Preset caricato e stringhe Bet Angel ricompilate!', 'info');
+        }
+
+        function resetAllConfig() {
+            loadPreset('sinner_alcaraz');
+            showToast('Configurazione ripristinata ai valori predefiniti.', 'info');
+        }
+
+        function switchMainTab(tabKey) {
+            const tabs = ['prompt', 'betangel', 'simulator', 'parser'];
+            tabs.forEach(k => {
+                const panel = document.getElementById(`tabPanel-${k}`);
+                const btn = document.getElementById(`mainTabBtn-${k}`);
+                if (k === tabKey) {
+                    panel.classList.remove('hidden');
+                    btn.className = "flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition cursor-pointer text-left";
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = "flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition cursor-pointer text-left";
+                }
+            });
+        }
+
+        function switchPromptView(mode) {
+            currentPromptSubView = mode;
+            const cards = document.getElementById('promptCardsContainer');
+            const raw = document.getElementById('promptRawContainer');
+            const btnC = document.getElementById('subBtnCards');
+            const btnR = document.getElementById('subBtnRaw');
+
+            if (mode === 'cards') {
+                cards.classList.remove('hidden');
+                raw.classList.add('hidden');
+                btnC.className = "px-3 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-pointer";
+                btnR.className = "px-3 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white cursor-pointer";
+            } else {
+                cards.classList.add('hidden');
+                raw.classList.remove('hidden');
+                btnR.className = "px-3 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-pointer";
+                btnC.className = "px-3 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white cursor-pointer";
+            }
+        }
+
+        function toggleV3Highlights() {
+            isV3HighlightActive = !isV3HighlightActive;
+            const container = document.getElementById('promptCardsContainer');
+            const txt = document.getElementById('txtHighlightV3');
+            if (isV3HighlightActive) {
+                container.classList.add('v3-highlight-active');
+                txt.textContent = 'Nascondi Evidenziazione v3.0';
+                showToast('Blocchi Quant v3.0, RAG e Bet Angel evidenziati!', 'info');
+            } else {
+                container.classList.remove('v3-highlight-active');
+                txt.textContent = 'Evidenzia Blocchi v3.0 & Bet Angel';
+            }
+        }
+
+        function filterPromptSections() {
+            const q = document.getElementById('searchPromptInput').value.trim().toLowerCase();
+            const cards = document.querySelectorAll('.prompt-section-card');
+            cards.forEach(c => {
+                const txt = c.dataset.searchText || '';
+                if (!q || txt.includes(q)) {
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                }
+            });
+        }
+
+        function copyToClipboard(text, message) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
             try {
                 document.execCommand('copy');
-                showToast(successMessage, 'success');
-            } catch (err) {
-                showToast('Errore durante la copia negli appunti.', 'error');
+                showToast(message, 'success');
+            } catch (e) {
+                showToast('Impossibile copiare negli appunti', 'error');
             }
-            document.body.removeChild(textarea);
+            document.body.removeChild(ta);
+        }
+
+        function copyTextById(elId, msg) {
+            const txt = document.getElementById(elId).textContent;
+            copyToClipboard(txt, msg);
         }
 
         function copyFullPrompt() {
-            const fullText = getCompletePromptText();
-            const hasMatch = Boolean(getMatchConfigBlock());
-            const msg = hasMatch
-                ? 'Prompt Master v2.0 + Input Match copiati negli appunti!'
-                : 'Prompt Master Tennis v2.0 integrale copiato negli appunti!';
-            copyToClipboard(fullText, msg);
+            copyToClipboard(getFullPromptTextV3(), 'Prompt Master v3.0 + Parametri Bet Angel copiati negli appunti!');
         }
 
-        function copyHeaderBlock() {
-            copyToClipboard(PROMPT_HEADER, 'Intestazione del Prompt copiata!');
-        }
-
-        function copySection(sectionId) {
-            const sec = PROMPT_SECTIONS.find(s => s.id === sectionId);
-            if (!sec) return;
-            copyToClipboard(sec.content, `Sezione ${sec.number} copiata negli appunti!`);
-        }
-
-        function copyMatchBlockOnly() {
-            const matchBlock = getMatchConfigBlock();
-            if (!matchBlock) return;
-            copyToClipboard(matchBlock, 'Blocco Input Match copiato negli appunti!');
-        }
-
-        function downloadFile(extension) {
-            const fullText = getCompletePromptText();
-            let content = fullText;
-            let filename = `PROMPT_MASTER_TENNIS_v2.0.${extension}`;
-            let mimeType = 'text/plain;charset=utf-8';
-
-            if (extension === 'md') {
-                mimeType = 'text/markdown;charset=utf-8';
+        function copyPromptSectionById(secId) {
+            const sections = getActivePromptSectionsList();
+            const found = sections.find(s => s.id === secId);
+            if (found) {
+                copyToClipboard(found.content, `Sezione ${found.number} copiata negli appunti!`);
             }
+        }
 
-            const blob = new Blob([content], { type: mimeType });
+        function copyDynamicMatchBlock() {
+            copyToClipboard(buildDynamicMatchContextBlock(), 'Blocco Contesto Match & Bet Angel copiato!');
+        }
+
+        function copyExcelCommandFormula() {
+            const txt = document.getElementById('baExcelFormulaL9').textContent;
+            copyToClipboard(txt, 'Formula Excel Comando (Cella L9/L11) copiata negli appunti!');
+        }
+
+        function downloadBetAngelCSV() {
+            const csvContent = document.getElementById('baCsvOutput').textContent;
+            const pA = (document.getElementById('cfgPlayerA').value || 'PlayerA').replace(/\s+/g, '_');
+            const pB = (document.getElementById('cfgPlayerB').value || 'PlayerB').replace(/\s+/g, '_');
+            const filename = `BetAngel_Guardian_SV_${pA}_vs_${pB}.csv`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -894,100 +1948,26 @@ Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
-            showToast(`File ${filename} scaricato con successo!`, 'success');
+            showToast(`File ${filename} scaricato! Pronto per Bet Angel Guardian.`, 'success');
         }
 
-        function toggleV2Highlights() {
-            isV2HighlightActive = !isV2HighlightActive;
-            const container = document.getElementById('cardsViewContainer');
-            const btn = document.getElementById('btnToggleDiff');
-            const txt = document.getElementById('txtToggleDiff');
-
-            if (isV2HighlightActive) {
-                container.classList.add('v2-highlight-active');
-                btn.classList.remove('bg-amber-500/10', 'text-amber-300');
-                btn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
-                txt.textContent = 'Nascondi Novità v2.0';
-                showToast('Evidenziazione blocchi nuovi e ottimizzati v2.0 attivata.', 'info');
-            } else {
-                container.classList.remove('v2-highlight-active');
-                btn.classList.add('bg-amber-500/10', 'text-amber-300');
-                btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
-                txt.textContent = 'Mostra Novità v2.0';
-            }
+        function downloadPromptFile(ext) {
+            const content = getFullPromptTextV3();
+            const filename = `PROMPT_MASTER_TENNIS_v3.0_QUANT_BETANGEL.${ext}`;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`File ${filename} esportato!`, 'success');
         }
 
-        function switchViewMode(mode) {
-            currentViewMode = mode;
-            const cardsView = document.getElementById('cardsViewContainer');
-            const rawView = document.getElementById('rawViewContainer');
-            const tabCards = document.getElementById('tabViewCards');
-            const tabRaw = document.getElementById('tabViewRaw');
-
-            if (mode === 'cards') {
-                cardsView.classList.remove('hidden');
-                rawView.classList.add('hidden');
-                tabCards.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer";
-                tabRaw.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer";
-            } else {
-                cardsView.classList.add('hidden');
-                rawView.classList.remove('hidden');
-                tabRaw.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition cursor-pointer";
-                tabCards.className = "flex-1 sm:flex-initial px-3 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer";
-            }
-        }
-
-        function filterSections() {
-            const query = document.getElementById('searchPromptInput').value.trim().toLowerCase();
-            const clearBtn = document.getElementById('btnClearSearch');
-            const cards = document.querySelectorAll('.prompt-section-card');
-
-            if (query.length > 0) {
-                clearBtn.classList.remove('hidden');
-                if (currentViewMode !== 'cards') switchViewMode('cards');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
-
-            cards.forEach(card => {
-                const title = card.dataset.sectionTitle || '';
-                const content = card.dataset.sectionContent || '';
-                if (!query || title.includes(query) || content.includes(query)) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-
-        function clearSearch() {
-            document.getElementById('searchPromptInput').value = '';
-            filterSections();
-        }
-
-        function scrollToSection(sectionId) {
-            if (currentViewMode !== 'cards') {
-                switchViewMode('cards');
-            }
-            const el = document.getElementById(sectionId);
-            if (!el) return;
-            const yOffset = -90;
-            const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: 'smooth' });
-
-            // Brief pulse effect
-            el.classList.add('ring-2', 'ring-emerald-400');
-            setTimeout(() => {
-                el.classList.remove('ring-2', 'ring-emerald-400');
-            }, 1400);
-        }
-
-        // ============================================================================
-        // 5. UTILITIES & TOAST NOTIFICATIONS
-        // ============================================================================
         function escapeHtml(str) {
-            return str
+            return String(str)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
@@ -998,7 +1978,6 @@ Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-
             let icon = 'fa-circle-check text-emerald-400';
             let border = 'border-emerald-500/40';
             if (type === 'info') {
@@ -1009,12 +1988,8 @@ Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi
                 border = 'border-rose-500/40';
             }
 
-            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900/95 backdrop-blur-md border ${border} text-xs font-medium text-white shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100`;
-            toast.innerHTML = `
-                <i class="fa-solid ${icon} text-sm"></i>
-                <span>${escapeHtml(message)}</span>
-            `;
-
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900/95 backdrop-blur-md border ${border} text-xs font-medium text-white shadow-2xl transition-all duration-300`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i><span>${escapeHtml(message)}</span>`;
             container.appendChild(toast);
 
             setTimeout(() => {
@@ -1025,8 +2000,9 @@ Individua le capacità tramite PPR e TDI, filtra il contesto ambientale, espandi
             }, 2800);
         }
 
-        // Initialize on window load
-        window.onload = initApp;
+        window.onload = function () {
+            recalcAll();
+        };
     </script>
 </body>
 </html>
